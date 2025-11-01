@@ -5,22 +5,56 @@
   --search-border-gray: #d3d3d3;
 }
 
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pulse-whatsapp {
+  0%, 100% {
+    box-shadow: 0 8px 32px rgba(37, 211, 102, 0.5), 0 2px 8px rgba(0,0,0,0.15);
+  }
+  50% {
+    box-shadow: 0 8px 40px rgba(37, 211, 102, 0.7), 0 4px 12px rgba(0,0,0,0.2);
+  }
+}
+
 /* --- GENERAL STYLES --- */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .app-bg {
   background: #f7faff;
   min-height: 100vh;
   font-family: 'Segoe UI', 'Arial', sans-serif;
   color: #202444;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 /* --- NAVBAR/HEADER --- */
 .navbar {
   width: 100%;
+  max-width: 100vw;
   background: #fff;
   border-bottom: 1px solid #eee;
   box-shadow: 0 4px 12px rgba(32, 101, 236, 0.07);
   position: relative;
   z-index: 100;
+  overflow-x: hidden;
 }
 
 .navbar-content {
@@ -31,7 +65,9 @@
   gap: 1.2rem;
   padding: 0 0.7rem;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
+  overflow-x: hidden;
 }
 
 .brand {

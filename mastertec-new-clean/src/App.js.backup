@@ -82,13 +82,10 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminTab, setAdminTab] = useState("products");
-  const [adminLoginError, setAdminLoginError] = useState("");
-  const [users, setUsers] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [reportsData, setReportsData] = useState(null);
-  const [flyingProduct, setFlyingProduct] = useState(null);
+  const [adminLoginError, setAdminLoginError] = useState("");
+  const [users, setUsers] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 const addDemoProductsToSupabase = async () => {
   try {
     const productData = demoProducts.map(prod => ({
@@ -100,22 +97,12 @@ const addDemoProductsToSupabase = async () => {
       inventory: prod.inventory,
       image: prod.image
     }));
-    const { data, error } = await supabase.from("products").insert(productData).select();
-    if (error) {
-      console.error("Supabase error:", error);
-      alert("Error adding demo products to Supabase: " + error.message + "\n\nCheck your browser console for details.");
-      return;
-    }
-    if (data && data.length > 0) {
-      alert(`✅ Successfully added ${data.length} demo products to Supabase!`);
-      fetchProducts();
-    } else {
-      alert("⚠️ Products may have been added but no data was returned. Please refresh to see them.");
-      fetchProducts();
-    }
+    const { data, error } = await supabase.from("products").insert(productData);
+    if (error) throw error;
+    alert("Demo products added!");
+    fetchProducts();
   } catch (err) {
-    console.error("Error adding demo products:", err);
-    alert("Error adding demo products: " + err.message + "\n\nCheck your browser console for details.");
+    alert("Error adding demo products: " + err.message);
   }
 };
 
@@ -142,133 +129,27 @@ const addDemoProductsToSupabase = async () => {
   const [checkoutError, setCheckoutError] = useState(null);
 
 
-  useEffect(() => { fetchProducts(); }, [isAdmin]);
-  useEffect(() => { if (isAdmin && adminTab === "users") fetchUsers(); }, [isAdmin, adminTab]);
-  useEffect(() => { if (isAdmin && adminTab === "orders") fetchOrders(); }, [isAdmin, adminTab]);
-  useEffect(() => { if (isAdmin && adminTab === "reports") fetchReports(); }, [isAdmin, adminTab]);
+  useEffect(() => { fetchProducts(); }, [isAdmin]);
+  useEffect(() => { if (isAdmin && adminTab === "users") fetchUsers(); }, [isAdmin, adminTab]);
 
 
-  const fetchProducts = async () => {
-    try {
-      const { data, error } = await supabase.from("products").select("*");
-      if (error) throw error;
-      // Map Supabase products to normalize discountPrice field
-      const normalizedProducts = (data || []).map(product => ({
-        ...product,
-        discountPrice: product.discountprice || product.discountPrice || null,
-        price: product.price || 0
-      }));
-      setAllProducts([...demoProducts, ...normalizedProducts]);
-    } catch (err) {
-      setAllProducts(demoProducts);
-      console.error("Error fetching products:", err);
-    }
-  };
-  const fetchUsers = async () => {
-    try {
-      // Fetch users from Supabase users table
-      const { data, error } = await supabase.from("users").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      setUsers(data || []);
-    } catch (err) {
-      console.error("Error fetching users:", err);
-      // Fallback: try backend API if Supabase fails
-      try {
-        const response = await axios.get(`${API_URL}/users`);
-        setUsers(response.data || []);
-      } catch (backendErr) {
-        console.error("Backend fallback also failed:", backendErr);
-        setUsers([]);
-      }
-    }
-  };
-  const fetchOrders = async () => {
-    try {
-      // Fetch orders from Supabase with user information
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*")
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      
-      // Get user info for each order
-      const ordersWithUsers = await Promise.all(
-        (data || []).map(async (order) => {
-          try {
-            const { data: userData } = await supabase
-              .from("users")
-              .select("name, email")
-              .eq("id", order.user_id)
-              .single();
-            
-            return {
-              ...order,
-              userName: userData?.name || "Unknown",
-              userEmail: userData?.email || order.user_id
-            };
-          } catch (err) {
-            return {
-              ...order,
-              userName: "Unknown",
-              userEmail: order.user_id
-            };
-          }
-        })
-      );
-      
-      setOrders(ordersWithUsers);
-    } catch (err) {
-      console.error("Error fetching orders:", err);
-      // Fallback to backend
-      try {
-        const response = await axios.get(`${API_URL}/orders`);
-        setOrders(response.data || []);
-      } catch (backendErr) {
-        setOrders([]);
-      }
-    }
-  };
-  const fetchReports = async () => {
-    try {
-      // Fetch from Supabase
-      const { count: productCount, error: productError } = await supabase
-        .from("products")
-        .select("*", { count: "exact", head: true });
-      
-      const { count: userCount, error: userError } = await supabase
-        .from("users")
-        .select("*", { count: "exact", head: true });
-      
-      const { count: orderCount, error: orderError } = await supabase
-        .from("orders")
-        .select("*", { count: "exact", head: true })
-        .catch(() => ({ count: 0, error: null }));
-      
-      const { data: ordersData } = await supabase
-        .from("orders")
-        .select("total")
-        .catch(() => ({ data: [] }));
-      
-      const totalSales = (ordersData || []).reduce((sum, order) => sum + (parseFloat(order?.total) || 0), 0);
-      
-      setReportsData({
-        totalOrders: orderCount || 0,
-        totalSales: totalSales || 0,
-        totalUsers: userCount || 0,
-        totalProducts: productCount || 0
-      });
-    } catch (err) {
-      console.error("Error fetching reports:", err);
-      // Fallback to backend
-      try {
-        const response = await axios.get(`${API_URL}/reports/summary`);
-        setReportsData(response.data || {});
-      } catch (backendErr) {
-        setReportsData(null);
-      }
-    }
-  };
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/products`);
+      setAllProducts([...demoProducts, ...res.data]);
+    } catch (err) {
+      setAllProducts(demoProducts);
+      console.error("Error fetching products:", err);
+    }
+  };
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/users`);
+      setUsers(res.data);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
+  };
 
 
   const loginUser = async (e) => {
@@ -314,31 +195,18 @@ const signupUser = async (e) => {
   e.preventDefault();
   setAdminLoginError("");
   try {
-    const email = e.target.email?.value || e.target.name?.value; // Support both email and name field
-    const password = e.target.password.value;
-    
-    // Try to sign in with Supabase Auth
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
-    
+    const { data, error } = await supabase.auth.getUser();
     if (error) throw error;
-    
-    // Check if user has admin role in metadata
     if (data.user && data.user.user_metadata && data.user.user_metadata.role === 'admin') {
       setCurrentUser(data.user);
       setIsAdmin(true);
       setShowAdmin(false);
-      setAdminLoginError("");
     } else {
-      // If not admin, sign them out immediately
-      await supabase.auth.signOut();
-      setAdminLoginError("You don't have admin privileges. Please contact support.");
+      setAdminLoginError("You don't have admin privileges");
     }
   } catch (err) {
     console.error(err);
-    setAdminLoginError(err.message || "Login failed. Please check your credentials.");
+    setAdminLoginError(err.message || "Login failed");
   }
 };
 
@@ -352,41 +220,7 @@ const signupUser = async (e) => {
   };
 
 
-  const addToCart = (product, e) => {
-    e?.preventDefault();
-    if (!currentUser && !isAdmin) {
-      // Show login prompt if not logged in
-      setShowCart(false);
-      setAuthTab("login");
-      setShowAuth(true);
-      alert("Please log in or sign up to add items to cart.");
-      return;
-    }
-    
-    // Get the button element for animation
-    const button = e?.target;
-    if (button) {
-      const rect = button.getBoundingClientRect();
-      setFlyingProduct({
-        name: product.name,
-        image: product.image || "/Logo.jpg",
-        startX: rect.left + rect.width / 2,
-        startY: rect.top + rect.height / 2
-      });
-      
-      // Remove animation state after animation completes
-      setTimeout(() => {
-        setFlyingProduct(null);
-        setCart([...cart, product]);
-      }, 800); // Animation duration
-    } else {
-      setCart([...cart, product]);
-    }
-  };
-  
-  const removeFromCart = (index) => {
-    setCart(cart.filter((_, i) => i !== index));
-  };
+  const addToCart = product => setCart([...cart, product]);
   const removeProduct = async (id) => {
   try {
     const { error } = await supabase.from("products").delete().eq("id", id);
@@ -424,53 +258,33 @@ const signupUser = async (e) => {
   };
 const addNewProduct = async (e) => {
   e.preventDefault();
-  try {
-    const productData = {
+ try {
+    const { data, error } = await supabase.from("products").insert([{
       name: newProduct.name,
       price: parseFloat(newProduct.price),
       discountprice: newProduct.discountPrice ? parseFloat(newProduct.discountPrice) : null,
       category: newProduct.category,
       description: newProduct.description,
       inventory: parseInt(newProduct.inventory),
-      image: newProduct.image || "/Logo.jpg"
-    };
-    
-    const { data, error } = await supabase.from("products").insert([productData]).select();
-    
-    if (error) {
-      console.error("Supabase error:", error);
-      alert("Error adding product to Supabase: " + error.message + "\n\nCheck your browser console for details.");
-      return;
-    }
-    
-    if (data && data.length > 0) {
-      alert("✅ Product successfully added to Supabase!");
-      setNewProduct({ name: "", price: "", discountPrice: "", category: categories[0], description: "", inventory: 10, image: "" });
-      setPreviewImageAdd(null);
-      setShowAddModal(false);
-      fetchProducts(); // Refresh product list
-    } else {
-      alert("⚠️ Product was created but no data was returned. Please refresh to see your product.");
-      fetchProducts();
-    }
+      image: newProduct.image
+    }]);
+    if (error) throw error;
+    setNewProduct({ name: "", price: "", discountPrice: "", category: categories[0], description: "", inventory: 10, image: "" });
+    setPreviewImageAdd(null);
+    setShowAddModal(false);
+    fetchProducts();
   } catch (err) {
-    console.error("Error adding product:", err);
-    alert("Error adding product: " + err.message + "\n\nCheck your browser console for details.");
+    alert("Error adding product: " + err.message);
   }
 };
 
 
 
-  const startEdit = (product) => {
-    // Normalize discountPrice field
-    const normalizedProduct = {
-      ...product,
-      discountPrice: product.discountPrice || product.discountprice || ""
-    };
-    setEditProduct(normalizedProduct);
-    setPreviewImageEdit(product.image || null);
-    setShowEditModal(true);
-  };
+  const startEdit = (product) => {
+    setEditProduct({ ...product });
+    setPreviewImageEdit(product.image || null);
+    setShowEditModal(true);
+  };
 
 
   const updateProduct = async (e) => {
@@ -513,75 +327,9 @@ const addNewProduct = async (e) => {
   const cartTotal = cart.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
 
 
-  // Calculate cart icon position for animation
-  const getCartIconPosition = () => {
-    const cartButton = document.querySelector('.cart-count')?.closest('button');
-    if (cartButton) {
-      const rect = cartButton.getBoundingClientRect();
-      return {
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2
-      };
-    }
-    return { x: window.innerWidth - 100, y: 50 }; // Fallback position
-  };
-
-  return (
-    <div className="app-bg">
-      {/* Flying Product Animation */}
-      {flyingProduct && (() => {
-        const cartPos = getCartIconPosition();
-        const deltaX = cartPos.x - flyingProduct.startX;
-        const deltaY = cartPos.y - flyingProduct.startY;
-        const animationId = `flyToCart-${Date.now()}`;
-        return (
-          <>
-            <style>{`
-              @keyframes ${animationId} {
-                0% {
-                  transform: translate(-50%, -50%) scale(1) rotate(0deg);
-                  opacity: 1;
-                }
-                50% {
-                  transform: translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px)) scale(0.8) rotate(180deg);
-                  opacity: 0.8;
-                }
-                100% {
-                  transform: translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px)) scale(0.3) rotate(360deg);
-                  opacity: 0;
-                }
-              }
-            `}</style>
-            <div
-              style={{
-                position: 'fixed',
-                top: `${flyingProduct.startY}px`,
-                left: `${flyingProduct.startX}px`,
-                width: '60px',
-                height: '60px',
-                zIndex: 9999,
-                pointerEvents: 'none',
-                animation: `${animationId} 0.8s ease-in-out forwards`,
-                transform: 'translate(-50%, -50%)'
-              }}
-            >
-              <img
-                src={flyingProduct.image}
-                alt={flyingProduct.name}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  border: '3px solid #2563eb',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
-                }}
-              />
-            </div>
-          </>
-        );
-      })()}
-      {/* WhatsApp Floating Button */}
+  return (
+    <div className="app-bg">
+      {/* WhatsApp Floating Button */}
       <a
         href="https://wa.me/254790999150?text=Hello%20Mastertec%20Solutions"
         target="_blank"
@@ -632,43 +380,37 @@ const addNewProduct = async (e) => {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <div className="nav-actions">
-            {!isAdmin && (
-              <button className="auth-btn"
-                onClick={() => {
-                  if (currentUser) {
-                    logout();
-                  } else {
-                    setAuthTab("login"); setShowAuth(true);
-                  }
-                }}>
-                Account {currentUser ? `(Log Out)` : ""}
-                <FiUser style={{ marginLeft: 7 }} />
-              </button>
-            )}
-            {!isAdmin && (
-              <button className="auth-btn" onClick={() => setShowCart(true)}>
-                <span className="react-icon"><FiShoppingCart /></span>
-                <span className="cart-count">{cart.length}</span>
-              </button>
-            )}
-            <button
-              className="auth-btn"
-              onClick={() => {
-                const aboutFooter = document.getElementById("about-footer");
-                if (aboutFooter) {
-                  aboutFooter.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-            >
-              Contact Us
-            </button>
-            {!currentUser && (
-              <button className="auth-btn" onClick={() => setShowAdmin(true)}>
-                Admin Sign In
-              </button>
-            )}
-          </div>
+          <div className="nav-actions">
+            <button className="auth-btn"
+              onClick={() => {
+                if (currentUser) {
+                  logout();
+                } else {
+                  setAuthTab("login"); setShowAuth(true);
+                }
+              }}>
+              Account {currentUser ? `(Log Out)` : ""}
+              <FiUser style={{ marginLeft: 7 }} />
+            </button>
+            <button className="auth-btn" onClick={() => setShowCart(true)}>
+              <span className="react-icon"><FiShoppingCart /></span>
+              <span className="cart-count">{cart.length}</span>
+            </button>
+            <button
+              className="auth-btn"
+              onClick={() => {
+                const aboutFooter = document.getElementById("about-footer");
+                if (aboutFooter) {
+                  aboutFooter.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+            >
+              Contact Us
+            </button>
+            <button className="auth-btn" onClick={() => setShowAdmin(true)}>
+              Admin Sign In
+            </button>
+          </div>
         </div>
       </div>
       {showAuth && (
@@ -701,28 +443,27 @@ const addNewProduct = async (e) => {
           )}
         </div>
       )}
-      {showAdmin && (
-        <div className="auth-modal">
-          <form className="auth-form" onSubmit={handleAdminLogin}>
-            <h3>Admin Sign In</h3>
-            <input type="email" name="email" id="admin-email" required placeholder="Admin Email" />
-            <input type="password" name="password" id="admin-password" required placeholder="Admin Password" />
-            <button type="submit">Sign In</button>
-            <button type="button" onClick={() => setShowAdmin(false)}>Cancel</button>
-            {adminLoginError && <div className="auth-error">{adminLoginError}</div>}
-          </form>
-        </div>
-      )}
+      {showAdmin && (
+        <div className="auth-modal">
+          <form className="auth-form" onSubmit={handleAdminLogin}>
+            <h3>Admin Sign In</h3>
+            <input type="text" name="name"id="admin-name" required placeholder="Admin Name" />
+            <input type="password" name="password"id="admin-password" required placeholder="Admin Password" />
+            <button type="submit">Sign In</button>
+            <button type="button" onClick={() => setShowAdmin(false)}>Cancel</button>
+            {adminLoginError && <div className="auth-error">{adminLoginError}</div>}
+          </form>
+        </div>
+      )}
       {isAdmin ? (
         <div className="admin-area">
           <button className="shop-btn" style={{ marginBottom: 20 }} onClick={() => setIsAdmin(false)}>
             <FiArrowLeft /> Back to Shop
           </button>
           <div className="admin-tabs" style={{ display: "flex", gap: 20, marginBottom: 20 }}>
-            <button onClick={() => setAdminTab("products")} className={adminTab === "products" ? "admin-tab-selected" : ""}>Products</button>
-            <button onClick={() => setAdminTab("users")} className={adminTab === "users" ? "admin-tab-selected" : ""}>Users</button>
-            <button onClick={() => setAdminTab("orders")} className={adminTab === "orders" ? "admin-tab-selected" : ""}>Orders</button>
-            <button onClick={() => setAdminTab("reports")} className={adminTab === "reports" ? "admin-tab-selected" : ""}>Reports</button>
+            <button onClick={() => setAdminTab("products")} className={adminTab === "products" ? "admin-tab-selected" : ""}>Products</button>
+            <button onClick={() => setAdminTab("users")} className={adminTab === "users" ? "admin-tab-selected" : ""}>Users</button>
+            <button onClick={() => setAdminTab("reports")} className={adminTab === "reports" ? "admin-tab-selected" : ""}>Reports</button>
           </div>
           {adminTab === "products" && (
             <>
@@ -787,145 +528,53 @@ const addNewProduct = async (e) => {
                   </form>
                 </div>
               )}
-             <div id="products" className="products-section">
-  <h2>Our Products ({allProducts.length})</h2>
+             <div id="products" className="products-section">
+  <h2>Our Products</h2>
   <div className="product-grid">
     {allProducts
       .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
       .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
-      .map(product => {
-        const discountPrice = product.discountPrice || product.discountprice;
-        const hasDeal = discountPrice && parseFloat(discountPrice) < parseFloat(product.price);
-        return (
+      .map(product => (
         <div key={product.id} className="product-card">
           <img src={product.image || "/Logo.jpg"} alt={product.name} />
           <div className="product-info">
             <h3>{product.name}</h3>
             <p>{product.description}</p>
-            <div className="price">
-              {hasDeal ? (
-                <>
-                  <span style={{ color: "#16a34a", fontWeight: "bold", fontSize: "1.2em" }}>Ksh {discountPrice}</span>
-                  <span style={{ textDecoration: "line-through", color: "#999", marginLeft: "10px" }}>Ksh {product.price}</span>
-                  <span style={{ background: "#dc2626", color: "white", padding: "2px 8px", borderRadius: "4px", marginLeft: "10px", fontSize: "0.8em" }}>DEAL</span>
-                </>
-              ) : (
-                <span>Ksh {product.price}</span>
-              )}
-            </div>
-            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-              <button className="admin-btn" onClick={() => startEdit(product)} style={{ flex: 1 }}>
-                <FiEdit2 /> Edit
-              </button>
-              <button className="admin-btn" onClick={() => removeProduct(product.id)} style={{ flex: 1, background: "#dc2626" }}>
-                <FiTrash2 /> Delete
-              </button>
-            </div>
+            <div className="price">Ksh {product.price}</div>
+            <button onClick={(e) => addToCart(product, e)}>Add to Cart</button>
           </div>
         </div>
-      );
-      })}
+      ))}
   </div>
 </div>
 
             </>
           )}
-          {adminTab === "users" && (
-            <div>
-              <h2>Users</h2>
-              <ul>
-                {users.map((user, i) => (
-                  <li key={user.id || i}>{user.name} ({user.email}) - {user.role}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {adminTab === "orders" && (
-            <div>
-              <h2>Customer Orders</h2>
-              {orders.length === 0 ? (
-                <p>No orders yet.</p>
-              ) : (
-                <div style={{ display: "grid", gap: "20px", marginTop: "20px" }}>
-                  {orders.map((order) => (
-                    <div key={order.id} style={{ 
-                      background: "#fff", 
-                      padding: "20px", 
-                      borderRadius: "8px", 
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                      borderLeft: "4px solid #2563eb"
-                    }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                        <h3 style={{ margin: 0 }}>Order #{order.id}</h3>
-                        <span style={{ 
-                          background: order.status === 'pending' ? '#fbbf24' : order.status === 'completed' ? '#16a34a' : '#dc2626',
-                          color: "white",
-                          padding: "4px 12px",
-                          borderRadius: "4px",
-                          fontSize: "0.9em"
-                        }}>
-                          {order.status || 'pending'}
-                        </span>
-                      </div>
-                      <div style={{ marginBottom: "8px" }}>
-                        <strong>Customer:</strong> {order.userName || 'Unknown'} ({order.userEmail || order.user_id})
-                      </div>
-                      <div style={{ marginBottom: "8px" }}>
-                        <strong>Phone:</strong> {order.phone || 'Not provided'}
-                      </div>
-                      <div style={{ marginBottom: "8px" }}>
-                        <strong>Delivery Address:</strong> {order.address || 'Not provided'}
-                      </div>
-                      <div style={{ marginBottom: "8px" }}>
-                        <strong>Total:</strong> Ksh {order.total || 0}
-                      </div>
-                      {order.created_at && (
-                        <div style={{ color: "#666", fontSize: "0.9em" }}>
-                          <strong>Date:</strong> {new Date(order.created_at).toLocaleString()}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-          {adminTab === "reports" && (
-            <div>
-              <h2>Reports</h2>
-              {reportsData ? (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px", marginTop: "20px" }}>
-                  <div style={{ background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-                    <h3>Total Orders</h3>
-                    <p style={{ fontSize: "2em", fontWeight: "bold", color: "#2563eb" }}>{reportsData.totalOrders || 0}</p>
-                  </div>
-                  <div style={{ background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-                    <h3>Total Sales</h3>
-                    <p style={{ fontSize: "2em", fontWeight: "bold", color: "#16a34a" }}>Ksh {reportsData.totalSales || 0}</p>
-                  </div>
-                  <div style={{ background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-                    <h3>Total Users</h3>
-                    <p style={{ fontSize: "2em", fontWeight: "bold", color: "#dc2626" }}>{reportsData.totalUsers || 0}</p>
-                  </div>
-                  <div style={{ background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-                    <h3>Total Products</h3>
-                    <p style={{ fontSize: "2em", fontWeight: "bold", color: "#ea580c" }}>{reportsData.totalProducts || 0}</p>
-                  </div>
-                </div>
-              ) : (
-                <div>Loading reports...</div>
-              )}
-            </div>
-          )}
+          {adminTab === "users" && (
+            <div>
+              <h2>Users</h2>
+              <ul>
+                {users.map((user, i) => (
+                  <li key={user.id || i}>{user.name} ({user.email}) - {user.role}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {adminTab === "reports" && (
+            <div>
+              <h2>Reports</h2>
+              <div>No reports yet (add backend logic for data)</div>
+            </div>
+          )}
         </div>
       ) : (
         <>
-          <div className="hero-section">
-            <h1>Get the Best Security & Tech Solutions</h1>
-            <p>Choose from top brands and categories, delivered fast across Kenya</p>
-            <a href="#products" className="shop-btn">Shop Now</a>
-          </div>
-          <div className="category-tabs">
+          <div className="hero-section">
+            <h1>Get the Best Security & Tech Solutions</h1>
+            <p>Choose from top brands and categories, delivered fast across Kenya</p>
+            <a href="#products" className="shop-btn">Shop Now</a>
+          </div>
+          <div className="category-tabs">
             {categories.map(cat => (
               <button
                 key={cat}
@@ -941,28 +590,22 @@ const addNewProduct = async (e) => {
           <div className="deals-section">
             <h2>Deals & Discounts</h2>
             <div className="product-grid">
-              {allProducts
-                .filter(product => {
-                  const discountPrice = product.discountPrice || product.discountprice;
-                  return discountPrice && parseFloat(discountPrice) < parseFloat(product.price || 0);
-                })
-                .map(product => {
-                  const discountPrice = product.discountPrice || product.discountprice;
-                  return (
-                  <div key={product.id} className="product-card">
-                    <img src={product.image || "/Logo.jpg"} alt={product.name} />
-                    <div className="product-info">
-                      <h3>{product.name}</h3>
-                      <div className="price">
-                        <span className="discounted-price">Ksh {discountPrice}</span>
-                        <span className="original-price">Ksh {product.price}</span>
-                      </div>
-                      <p>{product.description}</p>
-                      <button onClick={(e) => addToCart(product, e)}>Add to Cart</button>
-                    </div>
-                  </div>
-                );
-                })}
+              {allProducts
+                .filter(product => product.discountPrice && product.discountPrice < product.price)
+                .map(product => (
+                  <div key={product.id} className="product-card">
+                    <img src={product.image || "/Logo.jpg"} alt={product.name} />
+                    <div className="product-info">
+                      <h3>{product.name}</h3>
+                      <div className="price">
+                        <span className="discounted-price">Ksh {product.discountPrice}</span>
+                        <span className="original-price">Ksh {product.price}</span>
+                      </div>
+                      <p>{product.description}</p>
+                      <button onClick={(e) => addToCart(product, e)}>Add to Cart</button>
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
           {/* --- END DEALS SECTION --- */}
@@ -991,28 +634,13 @@ const addNewProduct = async (e) => {
             <div className="cart-sidebar">
               <h3>Your Cart</h3>
               {cart.length === 0 && <div>No items in cart.</div>}
-              {cart.map((item, idx) => (
-                <div key={idx} className="cart-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px", borderBottom: "1px solid #eee" }}>
-                  <span className="cart-item-name" style={{ flex: 1 }}>{item.name}</span>
-                  <span className="cart-item-qty">x1</span>
-                  <span className="cart-item-price">Ksh {item.price}</span>
-                  <button 
-                    onClick={() => removeFromCart(idx)}
-                    style={{ 
-                      background: "#dc2626", 
-                      color: "white", 
-                      border: "none", 
-                      borderRadius: "4px", 
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                      fontSize: "0.9em"
-                    }}
-                    title="Remove from cart"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+              {cart.map((item, idx) => (
+                <div key={idx} className="cart-item">
+                  <span className="cart-item-name">{item.name}</span>
+                  <span className="cart-item-qty">x1</span>
+                  <span className="cart-item-price">Ksh {item.price}</span>
+                </div>
+              ))}
               <div style={{ marginTop: 16, fontWeight: "bold" }}>
                 Total: Ksh {cartTotal}
               </div>
