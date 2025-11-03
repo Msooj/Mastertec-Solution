@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
-  FiCamera, FiServer, FiShield, FiBattery, FiCpu, FiWifi, FiPhone, FiEye, FiInbox, FiBarChart2, FiUser,
-  FiShoppingCart, FiPlusCircle, FiTrash2, FiEdit2, FiArrowLeft
+  FiCamera, FiServer, FiShield, FiBattery, FiCpu, FiWifi, FiPhone, FiEye, FiInbox, FiBarChart2, FiUser,
+  FiShoppingCart, FiPlusCircle, FiTrash2, FiEdit2, FiArrowLeft
 } from "react-icons/fi";
 import "./App.css";
+import "./AdminStyles.css";
 import { FaWhatsapp } from "react-icons/fa";
 import Footer from "./Footer";
 import { supabase } from "./supabaseClient";
-
-
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // Carousel CSS
 
 
 
@@ -17,71 +18,35 @@ const API_URL = "http://localhost:5000";
 
 
 const categoryIcons = {
-  CCTV: <FiCamera />,
-  Networking: <FiServer />,
-  Alarms: <FiShield />,
-  "Electric Fencing": <FiBattery />,
-  Computing: <FiCpu />,
-  "Wi-Fi": <FiWifi />,
-  Telephone: <FiPhone />,
-  Biometrics: <FiEye />,
-  "Fibre Optic": <FiInbox />,
-  Backups: <FiBattery />,
-  Electrical: <FiBarChart2 />
+  CCTV: <FiCamera />,
+  Networking: <FiServer />,
+  Alarms: <FiShield />,
+  "Electric Fencing": <FiBattery />,
+  Computing: <FiCpu />,
+  "Wi-Fi": <FiWifi />,
+  Telephone: <FiPhone />,
+  Biometrics: <FiEye />,
+  "Fibre Optic": <FiInbox />,
+  Backups: <FiBattery />,
+  Electrical: <FiBarChart2 />
 };
 const categories = Object.keys(categoryIcons);
 
-
-// --- DEMO DEALS PRODUCTS --- //
-const demoProducts = [
-  {
-    id: "demo-1",
-    name: "Wireless CCTV Camera",
-    price: 6500,
-    discountPrice: 5000,
-    category: "CCTV",
-    description: "Super HD wireless CCTV for home & business.",
-    image: "/Logo.jpg",
-    inventory: 20
-  },
-  {
-    id: "demo-2",
-    name: "Smart Alarm System",
-    price: 8000,
-    discountPrice: 6000,
-    category: "Alarms",
-    description: "Protect your property with remotely activated alarms.",
-    image: "/Logo.jpg",
-    inventory: 10
-  },
-  {
-    id: "demo-3",
-    name: "Fiber Optic Router",
-    price: 12000,
-    discountPrice: 9900,
-    category: "Networking",
-    description: "Fast, reliable fiber optics for stable internet.",
-    image: "/Logo.jpg",
-    inventory: 15
-  }
-];
-
-
 function App() {
-  const [cart, setCart] = useState([]);
-  const [showCart, setShowCart] = useState(false);
-  const [search, setSearch] = useState("");
-  const [selectedCat, setSelectedCat] = useState("All");
-  const [allProducts, setAllProducts] = useState([]);
-  const [showAuth, setShowAuth] = useState(false);
-  const [authTab, setAuthTab] = useState("login");
-  const [authEmail, setAuthEmail] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
-  const [signupError, setSignupError] = useState(null);
-  const [loginError, setLoginError] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [adminTab, setAdminTab] = useState("products");
+  const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selectedCat, setSelectedCat] = useState("All");
+  const [allProducts, setAllProducts] = useState([]);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authTab, setAuthTab] = useState("login");
+  const [authEmail, setAuthEmail] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [signupError, setSignupError] = useState(null);
+  const [loginError, setLoginError] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [adminTab, setAdminTab] = useState("products");
   const [adminLoginError, setAdminLoginError] = useState("");
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -89,57 +54,42 @@ function App() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [reportsData, setReportsData] = useState(null);
   const [flyingProduct, setFlyingProduct] = useState(null);
-const addDemoProductsToSupabase = async () => {
-  try {
-    const productData = demoProducts.map(prod => ({
-      name: prod.name,
-      price: prod.price,
-      discountprice: prod.discountPrice,
-      category: prod.category,
-      description: prod.description,
-      inventory: prod.inventory,
-      image: prod.image
-    }));
-    const { data, error } = await supabase.from("products").insert(productData).select();
-    if (error) {
-      console.error("Supabase error:", error);
-      alert("Error adding demo products to Supabase: " + error.message + "\n\nCheck your browser console for details.");
-      return;
-    }
-    if (data && data.length > 0) {
-      alert(`✅ Successfully added ${data.length} demo products to Supabase!`);
-      fetchProducts();
-    } else {
-      alert("⚠️ Products may have been added but no data was returned. Please refresh to see them.");
-      fetchProducts();
-    }
-  } catch (err) {
-    console.error("Error adding demo products:", err);
-    alert("Error adding demo products: " + err.message + "\n\nCheck your browser console for details.");
-  }
-};
+  const isLoggedIn = // however you check for authenticated user, e.g. from props, context, or a global state
+    currentUser !== null;
+
+  // Add discountPrice for deals
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    price: "",
+    discountPrice: "",
+    category: categories[0],
+    description: "",
+    inventory: 10,
+    image: ""
+  });
+  const [editProduct, setEditProduct] = useState(null);
 
 
-
-  // Add discountPrice for deals
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    price: "",
-    discountPrice: "",
-    category: categories[0],
-    description: "",
-    inventory: 10,
-    image: ""
-  });
-  const [editProduct, setEditProduct] = useState(null);
-
-
-  const [previewImageAdd, setPreviewImageAdd] = useState(null);
-  const [previewImageEdit, setPreviewImageEdit] = useState(null);
+  const [previewImageAdd, setPreviewImageAdd] = useState(null);
+  const [previewImageEdit, setPreviewImageEdit] = useState(null);
   const [adminEmail, setAdminEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
-  const [checkoutDetails, setCheckoutDetails] = useState({ phone: "", address: "" });
-  const [checkoutError, setCheckoutError] = useState(null);
+  const [checkoutDetails, setCheckoutDetails] = useState({ phone: "", address: "" });
+  const [checkoutError, setCheckoutError] = useState(null);
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
+  const [cartTab, setCartTab] = useState("items"); // "items" or "history"
+  const [showServiceBooking, setShowServiceBooking] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [bookingDetails, setBookingDetails] = useState({ phone: "", address: "", date: "", notes: "" });
+
+  const services = [
+    { id: 1, name: "CCTV Installation", description: "Professional CCTV system setup and installation", emoji: "📹" },
+    { id: 2, name: "Electric Fencing", description: "Complete electric fencing installation and maintenance", emoji: "⚡" },
+    { id: 3, name: "Access Control", description: "Advanced access control systems installation", emoji: "🔐" },
+    { id: 4, name: "Alarm Systems", description: "Professional alarm system setup", emoji: "🔔" },
+    { id: 5, name: "Networking Setup", description: "Network infrastructure and cabling", emoji: "🌐" },
+    { id: 6, name: "Consultation", description: "Free security consultation for your property", emoji: "💼" }
+  ];
 
 
   useEffect(() => { fetchProducts(); }, [isAdmin]);
@@ -158,9 +108,9 @@ const addDemoProductsToSupabase = async () => {
         discountPrice: product.discountprice || product.discountPrice || null,
         price: product.price || 0
       }));
-      setAllProducts([...demoProducts, ...normalizedProducts]);
+      setAllProducts(normalizedProducts);
     } catch (err) {
-      setAllProducts(demoProducts);
+      setAllProducts([]);
       console.error("Error fetching products:", err);
     }
   };
@@ -271,7 +221,23 @@ const addDemoProductsToSupabase = async () => {
   };
 
 
-  const loginUser = async (e) => {
+  const fetchPurchaseHistory = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      setPurchaseHistory(data || []);
+    } catch (err) {
+      console.error("Error fetching purchase history:", err);
+      setPurchaseHistory([]);
+    }
+  };
+
+  const loginUser = async (e) => {
   e.preventDefault();
   setLoginError(null);
   try {
@@ -281,6 +247,7 @@ const addDemoProductsToSupabase = async () => {
     });
     if (error) throw error;
     setCurrentUser(data.user);
+    fetchPurchaseHistory(data.user.id);
     setShowAuth(false);
     setAuthPassword(""); 
     setAuthEmail("");
@@ -310,7 +277,7 @@ const signupUser = async (e) => {
   }
 };
 
- const handleAdminLogin = async (e) => {
+ const handleAdminLogin = async (e) => {
   e.preventDefault();
   setAdminLoginError("");
   try {
@@ -342,13 +309,38 @@ const signupUser = async (e) => {
   }
 };
 
-  const logout =async () => {
-    await supabase.auth.signOut();
+  const logout =async () => {
+    await supabase.auth.signOut();
     setCurrentUser(null);
     setIsAdmin(false);
     setShowAdmin(false);
     setShowAuth(false);
     setAdminTab("products");
+  };
+
+  const handleServiceBooking = () => {
+    if (!currentUser) {
+      setAuthTab("login");
+      setShowAuth(true);
+      return;
+    }
+
+    if (!selectedService || !bookingDetails.phone || !bookingDetails.address) {
+      alert("Please fill in all required fields (phone and address)");
+      return;
+    }
+
+    const service = services.find(s => s.id === selectedService);
+    const message = `Hi Mastertec! I'd like to book a service.\n\nService: ${service.name}\nPhone: ${bookingDetails.phone}\nAddress: ${bookingDetails.address}${bookingDetails.date ? `\nPreferred Date: ${bookingDetails.date}` : ""}${bookingDetails.notes ? `\nNotes: ${bookingDetails.notes}` : ""}\n\nLooking forward to your response!`;
+
+    const whatsappUrl = `https://wa.me/254790999150?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+
+    // Reset form
+    setShowServiceBooking(false);
+    setSelectedService(null);
+    setBookingDetails({ phone: "", address: "", date: "", notes: "" });
+    alert("Redirecting to WhatsApp! Our team will get back to you shortly.");
   };
 
 
@@ -387,41 +379,101 @@ const signupUser = async (e) => {
   const removeFromCart = (index) => {
     setCart(cart.filter((_, i) => i !== index));
   };
-  const removeProduct = async (id) => {
+  const removeProduct = async (id) => {
   try {
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) throw error;
     fetchProducts();
+    alert("Product deleted successfully!");
   } catch (err) {
     alert("Error deleting product: " + err.message);
   }
 };
 
 
-  const handleAddImageChange = e => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        setPreviewImageAdd(evt.target.result);
-        setNewProduct({ ...newProduct, image: evt.target.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const handleAddImageChange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        setPreviewImageAdd(evt.target.result);
+        setNewProduct({ ...newProduct, image: evt.target.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
 
-  const handleEditImageChange = e => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        setPreviewImageEdit(evt.target.result);
-        setEditProduct({ ...editProduct, image: evt.target.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const handleEditImageChange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        setPreviewImageEdit(evt.target.result);
+        setEditProduct({ ...editProduct, image: evt.target.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+const addSampleProducts = async () => {
+  const sampleProducts = [
+    {
+      name: "Wireless CCTV Camera",
+      price: 6500,
+      category: "CCTV",
+      description: "Super HD wireless CCTV for home & business.",
+      inventory: 20,
+      image: "/Logo.jpg"
+    },
+    {
+      name: "Smart Alarm System",
+      price: 8000,
+      category: "Alarms",
+      description: "Protect your property with remotely activated alarms.",
+      inventory: 10,
+      image: "/Logo.jpg"
+    },
+    {
+      name: "Fiber Optic Router",
+      price: 12000,
+      category: "Networking",
+      description: "Fast, reliable fiber optics for stable internet.",
+      inventory: 15,
+      image: "/Logo.jpg"
+    },
+    {
+      name: "Wireless CCTV Camera",
+      price: 6500,
+      category: "CCTV",
+      description: "Super HD wireless CCTV for home & business.",
+      inventory: 20,
+      image: "/Logo.jpg"
+    }
+  ];
+
+  try {
+    let successCount = 0;
+    for (const product of sampleProducts) {
+      const { error } = await supabase.from("products").insert([{
+        name: product.name,
+        price: product.price,
+        discountprice: null,
+        category: product.category,
+        description: product.description,
+        inventory: product.inventory,
+        image: product.image
+      }]);
+      
+      if (!error) successCount++;
+    }
+    
+    alert(`✅ Added ${successCount} sample products!`);
+    fetchProducts();
+  } catch (err) {
+    alert("Error adding sample products: " + err.message);
+  }
+};
+
 const addNewProduct = async (e) => {
   e.preventDefault();
   try {
@@ -473,7 +525,7 @@ const addNewProduct = async (e) => {
   };
 
 
-  const updateProduct = async (e) => {
+  const updateProduct = async (e) => {
   e.preventDefault();
   try {
     const { error } = await supabase.from("products").update({
@@ -497,20 +549,10 @@ const addNewProduct = async (e) => {
 
 
 
-  const handleMpesaPayment = () => {
-    if (!checkoutDetails.phone || !checkoutDetails.address) {
-      setCheckoutError("Please provide phone number and address");
-      return;
-    }
-    alert(`STK push sent to ${checkoutDetails.phone} for delivery to ${checkoutDetails.address}`);
-    setShowCart(false);
-    setCheckoutDetails({ phone: "", address: "" });
-    setCheckoutError(null);
-    setCart([]);
-  };
+ 
 
 
-  const cartTotal = cart.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+  const cartTotal = cart.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
 
 
   // Calculate cart icon position for animation
@@ -534,34 +576,31 @@ const addNewProduct = async (e) => {
         const deltaX = cartPos.x - flyingProduct.startX;
         const deltaY = cartPos.y - flyingProduct.startY;
         const animationId = `flyToCart-${Date.now()}`;
+
         return (
           <>
             <style>{`
-              @keyframes ${animationId} {
-                0% {
-                  transform: translate(-50%, -50%) scale(1) rotate(0deg);
-                  opacity: 1;
-                }
-                50% {
-                  transform: translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px)) scale(0.8) rotate(180deg);
-                  opacity: 0.8;
-                }
-                100% {
-                  transform: translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px)) scale(0.3) rotate(360deg);
-                  opacity: 0;
-                }
-              }
-            `}</style>
+  @keyframes ${animationId} {
+    0% {
+      transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(${deltaX}px, ${deltaY}px) scale(0.3) rotate(360deg);
+      opacity: 0.3;
+    }
+  }
+`}</style>
             <div
               style={{
                 position: 'fixed',
-                top: `${flyingProduct.startY}px`,
-                left: `${flyingProduct.startX}px`,
+                top:  flyingProduct.startY + 'px',
+                left:flyingProduct.startX + 'px',
                 width: '60px',
                 height: '60px',
                 zIndex: 9999,
                 pointerEvents: 'none',
-                animation: `${animationId} 0.8s ease-in-out forwards`,
+                animation:animationId + '0.8s ease-in-out forwards',
                 transform: 'translate(-50%, -50%)'
               }}
             >
@@ -582,56 +621,56 @@ const addNewProduct = async (e) => {
         );
       })()}
       {/* WhatsApp Floating Button */}
-      <a
-        href="https://wa.me/254790999150?text=Hello%20Mastertec%20Solutions"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          position: "fixed",
-          bottom: "30px",
-          right: "30px",
-          width: "64px",
-          height: "64px",
-          zIndex: 1000,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#25d366",
-          borderRadius: "18px",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.18)"
-        }}
-        aria-label="WhatsApp"
-        title="Chat with us on WhatsApp"
-      >
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-          <path
-            d="M20 36.666C29.204 36.666 36.666 29.203 36.666 20C36.666 10.796 29.204 3.333 20 3.333 10.796 3.333 3.333 10.796 3.333 20 3.333 22.817 4.078 25.431 5.403 27.658L3.333 36.666 12.487 34.618C14.662 35.745 17.252 36.666 20 36.666Z"
-            fill="#0a0a0aff" opacity=".2"
-          />
-          <circle cx="20" cy="20" r="16" fill="#25d366" />
-          <path d="M27.364 23.672c-.348-.174-2.053-1.017-2.372-1.133-.319-.116-.551-.174-.783.174-.232.348-.899 1.133-1.104 1.366-.205.232-.405.261-.753.087-.348-.174-1.473-.543-2.806-1.728-1.037-.925-1.737-2.067-1.943-2.415-.205-.348-.023-.536.155-.71.16-.159.348-.405.522-.609.174-.203.232-.348.348-.58.116-.232.058-.435-.029-.609-.087-.174-.783-1.961-1.073-2.68-.287-.693-.584-.599-.783-.61l-.667-.012c-.174 0-.435.058-.666.29-.232.232-.882.858-.882 2.088s.903 2.422 1.029 2.59c.126.174 1.771 2.71 4.29 3.69.601.218 1.07.348 1.437.445.603.161 1.151.138 1.583.084.483-.062 1.481-.605 1.688-1.19.207-.584.207-1.083.145-1.19-.058-.109-.232-.174-.48-.29Z"
-            fill="#fffefeff"
-          />
-        </svg>
-      </a>
+      <a
+        href="https://wa.me/254790999150?text=Hello%20Mastertec%20Solutions"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: "fixed",
+          bottom: "30px",
+          right: "30px",
+          width: "64px",
+          height: "64px",
+          zIndex: 1000,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#25d366",
+          borderRadius: "18px",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.18)"
+        }}
+        aria-label="WhatsApp"
+        title="Chat with us on WhatsApp"
+      >
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <path
+            d="M20 36.666C29.204 36.666 36.666 29.203 36.666 20C36.666 10.796 29.204 3.333 20 3.333 10.796 3.333 3.333 10.796 3.333 20 3.333 22.817 4.078 25.431 5.403 27.658L3.333 36.666 12.487 34.618C14.662 35.745 17.252 36.666 20 36.666Z"
+            fill="#0a0a0aff" opacity=".2"
+          />
+          <circle cx="20" cy="20" r="16" fill="#25d366" />
+          <path d="M27.364 23.672c-.348-.174-2.053-1.017-2.372-1.133-.319-.116-.551-.174-.783.174-.232.348-.899 1.133-1.104 1.366-.205.232-.405.261-.753.087-.348-.174-1.473-.543-2.806-1.728-1.037-.925-1.737-2.067-1.943-2.415-.205-.348-.023-.536.155-.71.16-.159.348-.405.522-.609.174-.203.232-.348.348-.58.116-.232.058-.435-.029-.609-.087-.174-.783-1.961-1.073-2.68-.287-.693-.584-.599-.783-.61l-.667-.012c-.174 0-.435.058-.666.29-.232.232-.882.858-.882 2.088s.903 2.422 1.029 2.59c.126.174 1.771 2.71 4.29 3.69.601.218 1.07.348 1.437.445.603.161 1.151.138 1.583.084.483-.062 1.481-.605 1.688-1.19.207-.584.207-1.083.145-1.19-.058-.109-.232-.174-.48-.29Z"
+            fill="#fffefeff"
+          />
+        </svg>
+      </a>
 
 
-      {/* Header/Navbar Section */}
-      <div className="navbar">
-        <div className="navbar-content">
-          <div className="brand" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <img src="/Logo.jpg" alt="Logo" style={{ height: "48px", width: "48px" }} />
-            <span>Mastertec Solution</span>
-          </div>
-          <div className="header-center">
-            <input
-              className="search-bar"
-              type="text"
-              placeholder="Search products..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
+      {/* Header/Navbar Section */}
+      <div className="navbar">
+        <div className="navbar-content">
+          <div className="brand" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <img src="/Logo.jpg" alt="Logo" style={{ height: "48px", width: "48px" }} />
+            <span>Mastertec Solution</span>
+          </div>
+          <div className="header-center">
+            <input
+              className="search-bar"
+              type="text"
+              placeholder="Search products..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
           <div className="nav-actions">
             {!isAdmin && (
               <button className="auth-btn"
@@ -642,7 +681,7 @@ const addNewProduct = async (e) => {
                     setAuthTab("login"); setShowAuth(true);
                   }
                 }}>
-                Account {currentUser ? `(Log Out)` : ""}
+                Account {currentUser ? "Log Out" : ""}
                 <FiUser style={{ marginLeft: 7 }} />
               </button>
             )}
@@ -669,38 +708,38 @@ const addNewProduct = async (e) => {
               </button>
             )}
           </div>
-        </div>
-      </div>
-      {showAuth && (
-        <div className="auth-modal">
-          {authTab === "login" ? (
-            <form className="auth-form" onSubmit={loginUser}>
-               <input type="email" name="email" id="login-email" required placeholder="Email"
+        </div>
+      </div>
+      {showAuth && (
+        <div className="auth-modal">
+          {authTab === "login" ? (
+            <form className="auth-form" onSubmit={loginUser}>
+               <input type="email" name="email" id="login-email" required placeholder="Email"
       value={authEmail} onChange={e => setAuthEmail(e.target.value)} />
     <input type="password" name="password" id="login-password" required placeholder="Password"
       value={authPassword} onChange={e => setAuthPassword(e.target.value)} />
   <button type="submit">Log In</button>
-   {loginError && <div className="auth-error">{loginError}</div>}
-              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-                <button type="button" onClick={() => setAuthTab("signup")}>Switch to Sign Up</button>
-                <button type="button" onClick={() => setShowAuth(false)}>Cancel</button>
-              </div>
-            </form>
-          ) : (
-             <form className="auth-form" onSubmit={signupUser}>
-                <input type="text" name="name" id="signup-name" required placeholder="Full Name" />
-                <input type="email" name="email" id="signup-email" required placeholder="Email" />
-                <input type="password" name="password" id="signup-password" required placeholder="Password" />
-                <button type="submit">Sign Up</button>
-             {signupError && <div className="auth-error">{signupError}</div>}
-              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-                <button type="button" onClick={() => setAuthTab("login")}>Switch to Log In</button>
-                <button type="button" onClick={() => setShowAuth(false)}>Cancel</button>
-              </div>
-            </form>
-          )}
-        </div>
-      )}
+   {loginError && <div className="auth-error">{loginError}</div>}
+              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+                <button type="button" onClick={() => setAuthTab("signup")}>Switch to Sign Up</button>
+                <button type="button" onClick={() => setShowAuth(false)}>Cancel</button>
+              </div>
+            </form>
+          ) : (
+             <form className="auth-form" onSubmit={signupUser}>
+                <input type="text" name="name" id="signup-name" required placeholder="Full Name" />
+                <input type="email" name="email" id="signup-email" required placeholder="Email" />
+                <input type="password" name="password" id="signup-password" required placeholder="Password" />
+                <button type="submit">Sign Up</button>
+             {signupError && <div className="auth-error">{signupError}</div>}
+              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+                <button type="button" onClick={() => setAuthTab("login")}>Switch to Log In</button>
+                <button type="button" onClick={() => setShowAuth(false)}>Cancel</button>
+              </div>
+            </form>
+          )}
+        </div>
+      )}
       {showAdmin && (
         <div className="auth-modal">
           <form className="auth-form" onSubmit={handleAdminLogin}>
@@ -713,123 +752,166 @@ const addNewProduct = async (e) => {
           </form>
         </div>
       )}
-      {isAdmin ? (
-        <div className="admin-area">
-          <button className="shop-btn" style={{ marginBottom: 20 }} onClick={() => setIsAdmin(false)}>
-            <FiArrowLeft /> Back to Shop
-          </button>
-          <div className="admin-tabs" style={{ display: "flex", gap: 20, marginBottom: 20 }}>
+      {isAdmin ? (
+        <div className="admin-area">
+          <button className="shop-btn" style={{ marginBottom: 20 }} onClick={() => setIsAdmin(false)}>
+            <FiArrowLeft /> Back to Shop
+          </button>
+          <div className="admin-tabs" style={{ display: "flex", gap: 20, marginBottom: 20 }}>
             <button onClick={() => setAdminTab("products")} className={adminTab === "products" ? "admin-tab-selected" : ""}>Products</button>
             <button onClick={() => setAdminTab("users")} className={adminTab === "users" ? "admin-tab-selected" : ""}>Users</button>
             <button onClick={() => setAdminTab("orders")} className={adminTab === "orders" ? "admin-tab-selected" : ""}>Orders</button>
             <button onClick={() => setAdminTab("reports")} className={adminTab === "reports" ? "admin-tab-selected" : ""}>Reports</button>
-          </div>
-          {adminTab === "products" && (
-            <>
-              <button className="admin-btn" style={{ margin: "1em 0" }} onClick={addDemoProductsToSupabase}>
-      Add DEMO Products to Supabase
-    </button>
-              <button className="admin-btn" style={{ margin: "1em 0" }} onClick={() => setShowAddModal(true)}>
-                <FiPlusCircle /> Add Product
-              </button>
-              {showAddModal && (
-                <div className="modal-bg">
-                  <form onSubmit={addNewProduct} className="admin-product-form modal-form">
-                    <h3>Add Product</h3>
-                    <input type="text" placeholder="Name" value={newProduct.name}
-                      required onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} />
-                    <input type="text" placeholder="Price" value={newProduct.price}
-                      required onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} />
-                    <input type="text" placeholder="Discount Price" value={newProduct.discountPrice}
-                      onChange={e => setNewProduct({ ...newProduct, discountPrice: e.target.value })} />
-                    <input type="file" accept="image/*"
-                      onChange={handleAddImageChange} />
-                    {previewImageAdd && <img src={previewImageAdd} alt="Preview" style={{ maxWidth: "100px", marginBottom: "10px" }} />}
-                    <select
-                      value={newProduct.category}
-                      onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
-                    >
-                      {categories.map(cat => (
-                        <option value={cat} key={cat}>{cat}</option>
-                      ))}
-                    </select>
-                    <input type="text" placeholder="Description" value={newProduct.description}
-                      required onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} />
-                    <input type="number" placeholder="Inventory" value={newProduct.inventory}
-                      required onChange={e => setNewProduct({ ...newProduct, inventory: e.target.value })} />
-                    <div style={{ display: "flex", gap: 10 }}>
-                      <button type="submit" className="admin-btn"><FiPlusCircle /> Add</button>
-                      <button type="button" className="admin-btn" onClick={() => { setShowAddModal(false); setPreviewImageAdd(null); }}>Cancel</button>
-                    </div>
-                  </form>
-                </div>
-              )}
-              {showEditModal && editProduct && (
-                <div className="modal-bg">
-                  <form className="admin-product-form modal-form" onSubmit={updateProduct}>
-                    <h3>Edit Product</h3>
-                    <input type="text" value={editProduct.name} onChange={e => setEditProduct({ ...editProduct, name: e.target.value })} required />
-                    <input type="text" value={editProduct.price} onChange={e => setEditProduct({ ...editProduct, price: e.target.value })} required />
-                    <input type="text" value={editProduct.discountPrice || ""} placeholder="Discount Price" onChange={e => setEditProduct({ ...editProduct, discountPrice: e.target.value })} />
-                    <input type="file" accept="image/*" onChange={handleEditImageChange} />
-                    {previewImageEdit && <img src={previewImageEdit} alt="Preview" style={{ maxWidth: "100px", marginBottom: "10px" }} />}
-                    <select value={editProduct.category} onChange={e => setEditProduct({ ...editProduct, category: e.target.value })}>
-                      {categories.map(cat => (
-                        <option value={cat} key={cat}>{cat}</option>
-                      ))}
-                    </select>
-                    <input type="text" value={editProduct.description} onChange={e => setEditProduct({ ...editProduct, description: e.target.value })} required />
-                    <input type="number" value={editProduct.inventory} onChange={e => setEditProduct({ ...editProduct, inventory: e.target.value })} required />
-                    <div style={{ display: "flex", gap: 10 }}>
-                      <button type="submit" className="admin-btn"><FiEdit2 /> Save</button>
-                      <button type="button" className="admin-btn" onClick={() => { setEditProduct(null); setShowEditModal(false); setPreviewImageEdit(null); }}>Cancel</button>
-                    </div>
-                  </form>
-                </div>
-              )}
-             <div id="products" className="products-section">
-  <h2>Our Products ({allProducts.length})</h2>
-  <div className="product-grid">
-    {allProducts
-      .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
-      .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
-      .map(product => {
-        const discountPrice = product.discountPrice || product.discountprice;
-        const hasDeal = discountPrice && parseFloat(discountPrice) < parseFloat(product.price);
-        return (
-        <div key={product.id} className="product-card">
-          <img src={product.image || "/Logo.jpg"} alt={product.name} />
-          <div className="product-info">
-            <h3>{product.name}</h3>
-            <p>{product.description}</p>
-            <div className="price">
-              {hasDeal ? (
-                <>
-                  <span style={{ color: "#16a34a", fontWeight: "bold", fontSize: "1.2em" }}>Ksh {discountPrice}</span>
-                  <span style={{ textDecoration: "line-through", color: "#999", marginLeft: "10px" }}>Ksh {product.price}</span>
-                  <span style={{ background: "#dc2626", color: "white", padding: "2px 8px", borderRadius: "4px", marginLeft: "10px", fontSize: "0.8em" }}>DEAL</span>
-                </>
-              ) : (
-                <span>Ksh {product.price}</span>
-              )}
-            </div>
-            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-              <button className="admin-btn" onClick={() => startEdit(product)} style={{ flex: 1 }}>
-                <FiEdit2 /> Edit
-              </button>
-              <button className="admin-btn" onClick={() => removeProduct(product.id)} style={{ flex: 1, background: "#dc2626" }}>
-                <FiTrash2 /> Delete
-              </button>
-            </div>
           </div>
-        </div>
-      );
-      })}
-  </div>
-</div>
+          {adminTab === "products" && (
+            <>
+              <div style={{ display: "flex", gap: "10px", margin: "1em 0" }}>
+                <button className="admin-btn" onClick={() => setShowAddModal(true)}>
+                  <FiPlusCircle /> Add New Product
+                </button>
+                <button className="admin-btn" onClick={addSampleProducts} style={{ background: "#16a34a" }}>
+                  📦 Load Sample Products
+                </button>
+              </div>
+              {showAddModal && (
+                <div className="modal-bg">
+                  <form onSubmit={addNewProduct} className="admin-product-form modal-form">
+                    <h3>Add Product</h3>
+                    <input type="text" placeholder="Name" value={newProduct.name}
+                      required onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} />
+                    <input type="text" placeholder="Price" value={newProduct.price}
+                      required onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} />
+                    <input type="text" placeholder="Discount Price" value={newProduct.discountPrice}
+                      onChange={e => setNewProduct({ ...newProduct, discountPrice: e.target.value })} />
+                    <input type="file" accept="image/*"
+                      onChange={handleAddImageChange} />
+                    {previewImageAdd && <img src={previewImageAdd} alt="Preview" style={{ maxWidth: "100px", marginBottom: "10px" }} />}
+                    <select
+                      value={newProduct.category}
+                      onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
+                    >
+                      {categories.map(cat => (
+                        <option value={cat} key={cat}>{cat}</option>
+                      ))}
+                    </select>
+                    <input type="text" placeholder="Description" value={newProduct.description}
+                      required onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} />
+                    <input type="number" placeholder="Inventory" value={newProduct.inventory}
+                      required onChange={e => setNewProduct({ ...newProduct, inventory: e.target.value })} />
+                    <div style={{ display: "flex", gap: 10 }}>
+                      <button type="submit" className="admin-btn"><FiPlusCircle /> Add</button>
+                      <button type="button" className="admin-btn" onClick={() => { setShowAddModal(false); setPreviewImageAdd(null); }}>Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              )}
+              {showEditModal && editProduct && (
+                <div className="modal-bg">
+                  <form className="admin-product-form modal-form" onSubmit={updateProduct}>
+                    <h3>Edit Product</h3>
+                    <input type="text" value={editProduct.name} onChange={e => setEditProduct({ ...editProduct, name: e.target.value })} required />
+                    <input type="text" value={editProduct.price} onChange={e => setEditProduct({ ...editProduct, price: e.target.value })} required />
+                    <input type="text" value={editProduct.discountPrice || ""} placeholder="Discount Price" onChange={e => setEditProduct({ ...editProduct, discountPrice: e.target.value })} />
+                    <input type="file" accept="image/*" onChange={handleEditImageChange} />
+                    {previewImageEdit && <img src={previewImageEdit} alt="Preview" style={{ maxWidth: "100px", marginBottom: "10px" }} />}
+                    <select value={editProduct.category} onChange={e => setEditProduct({ ...editProduct, category: e.target.value })}>
+                      {categories.map(cat => (
+                        <option value={cat} key={cat}>{cat}</option>
+                      ))}
+                    </select>
+                    <input type="text" value={editProduct.description} onChange={e => setEditProduct({ ...editProduct, description: e.target.value })} required />
+                    <input type="number" value={editProduct.inventory} onChange={e => setEditProduct({ ...editProduct, inventory: e.target.value })} required />
+                    <div style={{ display: "flex", gap: 10 }}>
+                      <button type="submit" className="admin-btn"><FiEdit2 /> Save</button>
+                      <button type="button" className="admin-btn" onClick={() => { setEditProduct(null); setShowEditModal(false); setPreviewImageEdit(null); }}>Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              )}
 
-            </>
-          )}
+              <div id="products" className="products-section">
+              
+              {/* PRODUCTS WITH DISCOUNTS */}
+              <div style={{ marginBottom: "40px" }}>
+                <h2 style={{ borderBottom: "3px solid #fbbf24", paddingBottom: "10px", color: "#d97706" }}>
+                  🎉 Products with Discounts ({allProducts.filter(p => p.discountPrice || p.discountprice).length})
+                </h2>
+                <div className="product-grid">
+                  {allProducts.filter(p => p.discountPrice || p.discountprice).map(product => (
+                    <div key={product.id} className="product-card">
+                      <img src={product.image || "/Logo.jpg"} alt={product.name} />
+                      <div className="product-info">
+                        <h3>{product.name}</h3>
+                        <p>{product.description}</p>
+                        <div className="price">
+                          <span style={{ textDecoration: "line-through", color: "#999" }}>Ksh {product.price}</span>
+                          <br />
+                          <span className="discounted-price" style={{ fontSize: "1.2em", color: "#dc2626", fontWeight: "bold" }}>
+                            Deal: Ksh {product.discountPrice || product.discountprice}
+                          </span>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                        <button className="admin-btn" onClick={() => startEdit(product)} style={{ flex: 1 }}>
+                          <FiEdit2 /> Edit
+                        </button>
+                        <button className="admin-btn" onClick={() => removeProduct(product.id)} style={{ flex: 1, background: "#dc2626" }}>
+                          <FiTrash2 /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {allProducts.filter(p => p.discountPrice || p.discountprice).length === 0 && (
+                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "20px", color: "#999" }}>
+                      <p>No discount products yet.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* PRODUCTS WITHOUT DISCOUNTS */}
+              <div>
+                <h2 style={{ borderBottom: "3px solid #3b82f6", paddingBottom: "10px", color: "#1e40af" }}>
+                  📦 Regular Products ({allProducts.filter(p => !(p.discountPrice || p.discountprice)).length})
+                </h2>
+                <div className="product-grid">
+                  {allProducts.filter(p => !(p.discountPrice || p.discountprice)).map(product => (
+                    <div key={product.id} className="product-card">
+                      <img src={product.image || "/Logo.jpg"} alt={product.name} />
+                      <div className="product-info">
+                        <h3>{product.name}</h3>
+                        <p>{product.description}</p>
+                        <div className="price">
+                          Ksh {product.price}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                        <button className="admin-btn" onClick={() => startEdit(product)} style={{ flex: 1 }}>
+                          <FiEdit2 /> Edit
+                        </button>
+                        <button className="admin-btn" onClick={() => removeProduct(product.id)} style={{ flex: 1, background: "#dc2626" }}>
+                          <FiTrash2 /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {allProducts.filter(p => !(p.discountPrice || p.discountprice)).length === 0 && (
+                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "20px", color: "#999" }}>
+                      <p>No regular products yet.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {allProducts.length === 0 && (
+                <div style={{ textAlign: "center", padding: "40px 20px", color: "#999" }}>
+                  <p>No products yet. Create new ones!</p>
+                </div>
+              )}
+              </div>
+            </>
+          )}
+
           {adminTab === "users" && (
             <div>
               <h2>Users</h2>
@@ -917,149 +999,492 @@ const addNewProduct = async (e) => {
               )}
             </div>
           )}
-        </div>
-      ) : (
-        <>
-          <div className="hero-section">
-            <h1>Get the Best Security & Tech Solutions</h1>
-            <p>Choose from top brands and categories, delivered fast across Kenya</p>
-            <a href="#products" className="shop-btn">Shop Now</a>
-          </div>
-          <div className="category-tabs">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                className={`cat-btn${selectedCat === cat ? " cat-selected" : ""}`}
-                onClick={() => setSelectedCat(cat)}
-              >
-                <span className="cat-icon">{categoryIcons[cat]}</span>
-                {cat}
-              </button>
-            ))}
-          </div>
-          {/* --- DEALS SECTION --- */}
-          <div className="deals-section">
-            <h2>Deals & Discounts</h2>
-            <div className="product-grid">
-              {allProducts
-                .filter(product => {
-                  const discountPrice = product.discountPrice || product.discountprice;
-                  return discountPrice && parseFloat(discountPrice) < parseFloat(product.price || 0);
-                })
-                .map(product => {
-                  const discountPrice = product.discountPrice || product.discountprice;
-                  return (
-                  <div key={product.id} className="product-card">
-                    <img src={product.image || "/Logo.jpg"} alt={product.name} />
-                    <div className="product-info">
-                      <h3>{product.name}</h3>
-                      <div className="price">
-                        <span className="discounted-price">Ksh {discountPrice}</span>
-                        <span className="original-price">Ksh {product.price}</span>
-                      </div>
-                      <p>{product.description}</p>
-                      <button onClick={(e) => addToCart(product, e)}>Add to Cart</button>
-                    </div>
-                  </div>
-                );
-                })}
-            </div>
-          </div>
-          {/* --- END DEALS SECTION --- */}
-         <div id="products" className="products-section">
-  <h2>Our Products</h2>
-  <div className="product-grid">
-    {allProducts
-      .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
-      .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
-      .map(product => (
-        <div key={product.id} className="product-card">
-          <img src={product.image || "/Logo.jpg"} alt={product.name} />
-          <div className="product-info">
-            <h3>{product.name}</h3>
-            <p>{product.description}</p>
-            <div className="price">Ksh {product.price}</div>
-            <button onClick={(e) => addToCart(product, e)}>Add to Cart</button>
-          </div>
         </div>
-      ))}
-  </div>
-</div>
+ ) : (
+   <>
+     {/* Non-admin content goes here */}
+     <div className="hero-section" style={{ width: '100%', margin: '0 auto' }}>
+       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%">
+         <div>
+           <img src="/cctv_installation.jpg" alt="CCTV Installation" />
+           <div className="legend">
+             <h2>CCTV Installation</h2>
+             <p>Secure your premises with expert CCTV setup!</p>
+           </div>
+         </div>
+         <div>
+           <img src="/Electric_fencing.jpg" alt="Electric Fencing" />
+           <div className="legend">
+             <h2>Electric Fencing</h2>
+             <p>Perimeter protection with professional electric fencing installation!</p>
+           </div>
+         </div>
+         <div>
+           <img src="/Alarm_systems.jpg" alt="Alarm Systems" />
+           <div className="legend">
+             <h2>Alarm Systems</h2>
+             <p>Keep your property safe with advanced alarm systems!</p>
+           </div>
+         </div>
+       </Carousel>
+     </div>
 
+     <div className="category-tabs">
+       {categories.map(cat => (
+         <button
+           key={cat}
+           className={`cat-btn${selectedCat === cat ? " cat-selected" : ""}`}
+           onClick={() => setSelectedCat(cat)}
+         >
+           <span className="cat-icon">{categoryIcons[cat]}</span>
+           {cat}
+         </button>
+       ))}
+     </div>
 
-          {showCart && (
-            <div className="cart-sidebar">
-              <h3>Your Cart</h3>
-              {cart.length === 0 && <div>No items in cart.</div>}
-              {cart.map((item, idx) => (
-                <div key={idx} className="cart-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px", borderBottom: "1px solid #eee" }}>
-                  <span className="cart-item-name" style={{ flex: 1 }}>{item.name}</span>
-                  <span className="cart-item-qty">x1</span>
-                  <span className="cart-item-price">Ksh {item.price}</span>
-                  <button 
-                    onClick={() => removeFromCart(idx)}
-                    style={{ 
-                      background: "#dc2626", 
-                      color: "white", 
-                      border: "none", 
-                      borderRadius: "4px", 
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                      fontSize: "0.9em"
-                    }}
-                    title="Remove from cart"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-              <div style={{ marginTop: 16, fontWeight: "bold" }}>
-                Total: Ksh {cartTotal}
-              </div>
-              <div style={{ marginTop: 20 }}>
-                <input
-                  type="text"
-                  id="checkout-phone"
-                  placeholder="Your phone number"
-                  value={checkoutDetails.phone}
-                  onChange={e => setCheckoutDetails({ ...checkoutDetails, phone: e.target.value })}
-                  style={{ width: "100%", marginBottom: 8 }}
-                />
-                <input
-                  type="text"
-                  id="checkout-address"
-                  placeholder="Delivery address"
-                  value={checkoutDetails.address}
-                  onChange={e => setCheckoutDetails({ ...checkoutDetails, address: e.target.value })}
-                  style={{ width: "100%", marginBottom: 8 }}
-                />
-                {checkoutError && <div className="auth-error">{checkoutError}</div>}
-                {currentUser ? (
-                  <button className="checkout-btn" style={{ marginBottom: 8 }} onClick={handleMpesaPayment}>
-                    Pay Now (MPESA STK)
-                  </button>
-                ) : (
-                  <button className="checkout-btn" style={{ marginBottom: 8 }} onClick={() => {
-                    setShowCart(false);
-                    setAuthTab("login");
-                    setShowAuth(true);
-                  }}>
-                    Login or Sign Up to Complete Purchase
-                  </button>
-                )}
-                <button className="checkout-btn" onClick={() => setShowCart(false)}>
-                  Close Cart
-                </button>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-      {/* FOOTER ALWAYS AT THE BOTTOM */}
-      <Footer />
-    </div>
-  );
+     {/* --- DEALS SECTION --- */}
+     <div className="deals-section">
+       <h2>Deals & Discounts</h2>
+       <div className="product-grid">
+         {allProducts
+           .filter(product => {
+             const discountPrice = product.discountPrice || product.discountprice;
+             return discountPrice && parseFloat(discountPrice) < parseFloat(product.price || 0);
+           })
+           .map(product => {
+             const discountPrice = product.discountPrice || product.discountprice;
+             return (
+               <div key={product.id} className="product-card">
+                 <img src={product.image || "/Logo.jpg"} alt={product.name} />
+                 <div className="product-info">
+                   <h3>{product.name}</h3>
+                   <div className="price">
+                     <span className="discounted-price">Ksh {discountPrice}</span>
+                     <span className="original-price">Ksh {product.price}</span>
+                   </div>
+                   <p>{product.description}</p>
+                   {currentUser ? (
+                     <button
+                       style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
+                       onClick={() => {
+                         const phone = '254790999150';
+                         const message = encodeURIComponent(`Hello, I want to buy the ${product.name} (Ksh ${product.price}).`);
+                         window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                       }}
+                     >
+                       Order via WhatsApp
+                     </button>
+                   ) : (
+                     <button
+                       style={{ background: '#ff9500', color: 'white', marginLeft: '8px', marginTop: '4px', cursor: 'pointer' }}
+                       onClick={() => { 
+                         setAuthTab("login"); 
+                         setShowAuth(true); 
+                       }}
+                     >
+                       Log in to Buy
+                     </button>
+                   )}
+                 </div>
+               </div>
+             );
+           })}
+       </div>
+     </div>
+     {/* --- END DEALS SECTION --- */}
+
+     <div id="products" className="products-section">
+       <h2>Our Products</h2>
+       <div className="product-grid">
+         {allProducts
+           .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
+           .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
+           .map(product => (
+             <div key={product.id} className="product-card">
+               <img src={product.image || "/Logo.jpg"} alt={product.name} />
+               <div className="product-info">
+                 <h3>{product.name}</h3>
+                 <p>{product.description}</p>
+                 <div className="price">Ksh {product.price}</div>
+                 {currentUser ? (
+                   <button
+                     style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
+                     onClick={() => {
+                       const phone = '254790999159';
+                       const message = encodeURIComponent(
+                         `Hello, I want to buy the ${product.name} (Ksh ${product.price}).`
+                       );
+                       window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                     }}
+                   >
+                     Buy via WhatsApp
+                   </button>
+                 ) : (
+                   <button
+                     style={{ background: '#ff9500', color: 'white', marginLeft: '8px', marginTop: '4px', cursor: 'pointer' }}
+                     onClick={() => { 
+                       setAuthTab("login"); 
+                       setShowAuth(true); 
+                     }}
+                   >
+                     Log in to Buy
+                   </button>
+                 )}
+               </div>
+             </div>
+           ))}
+       </div>
+     </div>
+
+     {showCart && (
+       <div className="cart-sidebar">
+         <h3>Shopping & Order History</h3>
+         {currentUser && (
+           <div style={{ display: "flex", gap: "8px", marginBottom: "16px", borderBottom: "2px solid #eee", paddingBottom: "8px" }}>
+             <button
+               onClick={() => setCartTab("items")}
+               style={{
+                 flex: 1,
+                 padding: "8px 12px",
+                 background: cartTab === "items" ? "#ff9500" : "#f0f0f0",
+                 color: cartTab === "items" ? "white" : "#333",
+                 border: "none",
+                 borderRadius: "4px",
+                 cursor: "pointer",
+                 fontWeight: "bold",
+                 fontSize: "0.95em"
+               }}
+             >
+               🛒 Current Items ({cart.length})
+             </button>
+             <button
+               onClick={() => setCartTab("history")}
+               style={{
+                 flex: 1,
+                 padding: "8px 12px",
+                 background: cartTab === "history" ? "#ff9500" : "#f0f0f0",
+                 color: cartTab === "history" ? "white" : "#333",
+                 border: "none",
+                 borderRadius: "4px",
+                 cursor: "pointer",
+                 fontWeight: "bold",
+                 fontSize: "0.95em"
+               }}
+             >
+               📋 Purchase History
+             </button>
+           </div>
+         )}
+
+         {cartTab === "items" && (
+           <>
+             {cart.length === 0 && <div style={{ padding: "10px", color: "#666" }}>No items in cart.</div>}
+             {cart.map((item, idx) => (
+               <div key={idx} className="cart-item" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px", borderBottom: "1px solid #eee" }}>
+                 <span className="cart-item-name" style={{ flex: 1 }}>{item.name}</span>
+                 <span className="cart-item-qty">x1</span>
+                 <span className="cart-item-price">Ksh {item.price}</span>
+                 <button
+                   onClick={() => removeFromCart(idx)}
+                   style={{
+                     background: "#dc2626",
+                     color: "white",
+                     border: "none",
+                     borderRadius: "4px",
+                     padding: "4px 8px",
+                     cursor: "pointer",
+                     fontSize: "0.9em"
+                   }}
+                   title="Remove from cart"
+                 >
+                   ✕
+                 </button>
+               </div>
+             ))}
+             <div style={{ marginTop: 16, fontWeight: "bold", padding: "10px", background: "#f9f9f9", borderRadius: "4px" }}>
+               Total: Ksh {cartTotal}
+             </div>
+           </>
+         )}
+
+         {cartTab === "history" && (
+           <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+             {currentUser ? (
+               <>
+                 {purchaseHistory && purchaseHistory.length > 0 ? (
+                   purchaseHistory.map((order, idx) => (
+                     <div key={idx} style={{ padding: "12px", borderBottom: "1px solid #eee", marginBottom: "8px", background: "#f9f9f9", borderRadius: "4px" }}>
+                       <div style={{ fontWeight: "bold", color: "#ff9500", marginBottom: "6px" }}>
+                         Order #{order.id?.toString().slice(-6) || idx + 1}
+                       </div>
+                       <div style={{ fontSize: "0.9em", color: "#666", marginBottom: "4px" }}>
+                         <strong>Amount:</strong> Ksh {order.total_amount}
+                       </div>
+                       <div style={{ fontSize: "0.9em", color: "#666", marginBottom: "4px" }}>
+                         <strong>Items:</strong> {order.items_count || 1}
+                       </div>
+                       <div style={{ fontSize: "0.9em", color: "#666", marginBottom: "4px" }}>
+                         <strong>Date:</strong> {order.created_at ? new Date(order.created_at).toLocaleDateString() : "N/A"}
+                       </div>
+                       <div style={{ fontSize: "0.9em", color: "#666" }}>
+                         <strong>Status:</strong> <span style={{ color: order.status === "completed" ? "#10b981" : "#f59e0b" }}>{order.status || "Pending"}</span>
+                       </div>
+                     </div>
+                   ))
+                 ) : (
+                   <div style={{ padding: "20px", textAlign: "center", color: "#999" }}>
+                     No purchase history yet.
+                   </div>
+                 )}
+               </>
+             ) : (
+               <div style={{ padding: "20px", textAlign: "center", color: "#999" }}>
+                 Please log in to view your purchase history.
+               </div>
+             )}
+           </div>
+         )}
+
+         <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+           {cartTab === "items" && cart.length > 0 && currentUser && (
+             <button
+               style={{
+                 flex: 1,
+                 background: "#10b981",
+                 color: "#fff",
+                 border: "none",
+                 borderRadius: "4px",
+                 padding: "8px 16px",
+                 fontSize: "14px",
+                 cursor: "pointer",
+                 fontWeight: "bold",
+                 boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+               }}
+               onClick={() => {
+                 const phone = '254790999150';
+                 const message = encodeURIComponent(`Hello, I want to buy these items:\n${cart.map(item => `- ${item.name} (Ksh ${item.price})`).join('\n')}\n\nTotal: Ksh ${cartTotal}\n\nPlease provide delivery details.`);
+                 window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+               }}
+               title="Proceed to Payment"
+             >
+               ✓ Buy via WhatsApp
+             </button>
+           )}
+           <button className="Close-btn"
+             style={{
+               flex: 1,
+               background: "#f44336",
+               color: "#fff",
+               border: "none",
+               borderRadius: "4px",
+               padding: "8px 16px",
+               fontSize: "14px",
+               cursor: "pointer",
+               fontWeight: "bold",
+               boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+             }}
+             onClick={() => setShowCart(false)}
+             title="Close Cart"
+           >
+             × Close
+           </button>
+         </div>
+       </div>
+     )}
+     
+     {/* SERVICE BOOKING MODAL */}
+     {showServiceBooking && (
+       <div style={{
+         position: "fixed",
+         top: 0,
+         left: 0,
+         width: "100%",
+         height: "100%",
+         background: "rgba(0,0,0,0.5)",
+         display: "flex",
+         alignItems: "center",
+         justifyContent: "center",
+         zIndex: 999
+       }} onClick={() => setShowServiceBooking(false)}>
+         <div style={{
+           background: "#fff",
+           borderRadius: "8px",
+           padding: "24px",
+           maxWidth: "500px",
+           width: "90%",
+           boxShadow: "0 4px 16px rgba(0,0,0,0.15)"
+         }} onClick={e => e.stopPropagation()}>
+           <h2 style={{ marginTop: 0, color: "#333", fontSize: "24px", marginBottom: "16px" }}>
+             🔧 Book a Service
+           </h2>
+           
+           <form onSubmit={(e) => {
+             e.preventDefault();
+             handleServiceBooking();
+           }} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+             
+             {/* Service Selection */}
+             <div>
+               <label style={{ display: "block", marginBottom: "6px", fontWeight: "bold", color: "#555" }}>
+                 Select Service *
+               </label>
+               <select
+                 value={selectedService}
+                 onChange={(e) => setSelectedService(e.target.value)}
+                 style={{
+                   width: "100%",
+                   padding: "10px",
+                   border: "1px solid #ddd",
+                   borderRadius: "4px",
+                   fontSize: "14px",
+                   fontFamily: "inherit"
+                 }}
+                 required
+               >
+                 <option value="">-- Choose a service --</option>
+                 {services.map(service => (
+                   <option key={service.id} value={service.id}>
+                     {service.emoji} {service.name} - {service.description}
+                   </option>
+                 ))}
+               </select>
+             </div>
+
+             {/* Phone Number */}
+             <div>
+               <label style={{ display: "block", marginBottom: "6px", fontWeight: "bold", color: "#555" }}>
+                 Phone Number *
+               </label>
+               <input
+                 type="tel"
+                 value={bookingDetails.phone}
+                 onChange={(e) => setBookingDetails({ ...bookingDetails, phone: e.target.value })}
+                 placeholder="e.g., +254790999150"
+                 style={{
+                   width: "100%",
+                   padding: "10px",
+                   border: "1px solid #ddd",
+                   borderRadius: "4px",
+                   fontSize: "14px",
+                   boxSizing: "border-box"
+                 }}
+                 required
+               />
+             </div>
+
+             {/* Address */}
+             <div>
+               <label style={{ display: "block", marginBottom: "6px", fontWeight: "bold", color: "#555" }}>
+                 Address *
+               </label>
+               <input
+                 type="text"
+                 value={bookingDetails.address}
+                 onChange={(e) => setBookingDetails({ ...bookingDetails, address: e.target.value })}
+                 placeholder="Enter your address"
+                 style={{
+                   width: "100%",
+                   padding: "10px",
+                   border: "1px solid #ddd",
+                   borderRadius: "4px",
+                   fontSize: "14px",
+                   boxSizing: "border-box"
+                 }}
+                 required
+               />
+             </div>
+
+             {/* Booking Date */}
+             <div>
+               <label style={{ display: "block", marginBottom: "6px", fontWeight: "bold", color: "#555" }}>
+                 Preferred Date *
+               </label>
+               <input
+                 type="date"
+                 value={bookingDetails.date}
+                 onChange={(e) => setBookingDetails({ ...bookingDetails, date: e.target.value })}
+                 style={{
+                   width: "100%",
+                   padding: "10px",
+                   border: "1px solid #ddd",
+                   borderRadius: "4px",
+                   fontSize: "14px",
+                   boxSizing: "border-box"
+                 }}
+                 required
+               />
+             </div>
+
+             {/* Additional Notes */}
+             <div>
+               <label style={{ display: "block", marginBottom: "6px", fontWeight: "bold", color: "#555" }}>
+                 Additional Notes (Optional)
+               </label>
+               <textarea
+                 value={bookingDetails.notes}
+                 onChange={(e) => setBookingDetails({ ...bookingDetails, notes: e.target.value })}
+                 placeholder="Tell us more about your requirements..."
+                 style={{
+                   width: "100%",
+                   padding: "10px",
+                   border: "1px solid #ddd",
+                   borderRadius: "4px",
+                   fontSize: "14px",
+                   boxSizing: "border-box",
+                   minHeight: "80px",
+                   fontFamily: "inherit",
+                   resize: "vertical"
+                 }}
+               />
+             </div>
+
+             {/* Buttons */}
+             <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+               <button
+                 type="submit"
+                 style={{
+                   flex: 1,
+                   background: "#ff9500",
+                   color: "#fff",
+                   border: "none",
+                   borderRadius: "4px",
+                   padding: "12px",
+                   fontSize: "14px",
+                   fontWeight: "bold",
+                   cursor: "pointer",
+                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                 }}
+               >
+                 ✓ Book via WhatsApp
+               </button>
+               <button
+                 type="button"
+                 onClick={() => setShowServiceBooking(false)}
+                 style={{
+                   flex: 1,
+                   background: "#f44336",
+                   color: "#fff",
+                   border: "none",
+                   borderRadius: "4px",
+                   padding: "12px",
+                   fontSize: "14px",
+                   fontWeight: "bold",
+                   cursor: "pointer",
+                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                 }}
+               >
+                 × Close
+               </button>
+             </div>
+           </form>
+         </div>
+       </div>
+     )}
+     </>
+   )}
+   <Footer/>
+    </div>
+  );
 }
-
 
 export default App;
