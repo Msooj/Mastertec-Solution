@@ -81,6 +81,31 @@ function App() {
   const [showServiceBooking, setShowServiceBooking] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [bookingDetails, setBookingDetails] = useState({ phone: "", address: "", date: "", notes: "" });
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const heroSlides = [
+    {
+      image: "/cctv_installation.jpg",
+      title: "CCTV Installation",
+      description: "Secure your premises with expert CCTV setup!",
+      alt: "CCTV Installation",
+      category: "CCTV"
+    },
+    {
+      image: "/Electric_fencing.jpg",
+      title: "Electric Fencing",
+      description: "Perimeter protection with professional electric fencing installation!",
+      alt: "Electric Fencing",
+      category: "Electric Fencing"
+    },
+    {
+      image: "/Alarm_systems.jpg",
+      title: "Alarm Systems",
+      description: "Keep your property safe with advanced alarm systems!",
+      alt: "Alarm Systems",
+      category: "Alarms"
+    }
+  ];
 
   const services = [
     { id: 1, name: "CCTV Installation", description: "Professional CCTV system setup and installation", emoji: "📹" },
@@ -1004,28 +1029,19 @@ const addNewProduct = async (e) => {
    <>
      {/* Non-admin content goes here */}
      <div className="hero-section" style={{ width: '100%', margin: '0 auto' }}>
-       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%">
-         <div>
-           <img src="/cctv_installation.jpg" alt="CCTV Installation" />
-           <div className="legend">
-             <h2>CCTV Installation</h2>
-             <p>Secure your premises with expert CCTV setup!</p>
+       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={5000}>
+         {heroSlides.map((slide, index) => (
+           <div key={index}>
+             <img src={slide.image} alt={slide.alt} />
+             <div className="legend">
+               <h2>{slide.title}</h2>
+               <p>{slide.description}</p>
+               <button className="cta-btn" onClick={() => { setSelectedCat(slide.category); document.querySelector('.category-tabs')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                 Shop Now
+               </button>
+             </div>
            </div>
-         </div>
-         <div>
-           <img src="/Electric_fencing.jpg" alt="Electric Fencing" />
-           <div className="legend">
-             <h2>Electric Fencing</h2>
-             <p>Perimeter protection with professional electric fencing installation!</p>
-           </div>
-         </div>
-         <div>
-           <img src="/Alarm_systems.jpg" alt="Alarm Systems" />
-           <div className="legend">
-             <h2>Alarm Systems</h2>
-             <p>Keep your property safe with advanced alarm systems!</p>
-           </div>
-         </div>
+         ))}
        </Carousel>
      </div>
 
