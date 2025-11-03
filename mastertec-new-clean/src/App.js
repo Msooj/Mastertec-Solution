@@ -1110,7 +1110,7 @@ const addNewProduct = async (e) => {
                    <button
                      style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
                      onClick={() => {
-                       const phone = '254790999159';
+                       const phone = '254790999150';
                        const message = encodeURIComponent(
                          `Hello, I want to buy the ${product.name} (Ksh ${product.price}).`
                        );
