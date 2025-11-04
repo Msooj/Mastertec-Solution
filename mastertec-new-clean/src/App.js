@@ -117,7 +117,10 @@ function App() {
   ];
 
 
-  useEffect(() => { fetchProducts(); }, [isAdmin]);
+  useEffect(() => {
+    console.log("App mounted, fetching products...");
+    fetchProducts();
+  }, [isAdmin]);
   useEffect(() => { if (isAdmin && adminTab === "users") fetchUsers(); }, [isAdmin, adminTab]);
   useEffect(() => { if (isAdmin && adminTab === "orders") fetchOrders(); }, [isAdmin, adminTab]);
   useEffect(() => { if (isAdmin && adminTab === "reports") fetchReports(); }, [isAdmin, adminTab]);
@@ -125,18 +128,31 @@ function App() {
 
   const fetchProducts = async () => {
     try {
+      console.log("Fetching products from Supabase...");
       const { data, error } = await supabase.from("products").select("*");
       if (error) throw error;
+      console.log("Products fetched:", data);
       // Map Supabase products to normalize discountPrice field
       const normalizedProducts = (data || []).map(product => ({
         ...product,
         discountPrice: product.discountprice || product.discountPrice || null,
         price: product.price || 0
       }));
+      console.log("Normalized products:", normalizedProducts);
       setAllProducts(normalizedProducts);
     } catch (err) {
-      setAllProducts([]);
       console.error("Error fetching products:", err);
+      setAllProducts([]);
+      // Try fallback to backend if Supabase fails
+      try {
+        console.log("Trying backend fallback...");
+        const response = await axios.get(`${API_URL}/products`);
+        console.log("Backend products:", response.data);
+        setAllProducts(response.data || []);
+      } catch (backendErr) {
+        console.error("Backend fallback also failed:", backendErr);
+        setAllProducts([]);
+      }
     }
   };
   const fetchUsers = async () => {
@@ -1103,44 +1119,58 @@ const addNewProduct = async (e) => {
      <div id="products" className="products-section">
        <h2>Our Products</h2>
        <div className="product-grid">
-         {allProducts
-           .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
-           .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
-           .map(product => (
-             <div key={product.id} className="product-card">
-               <img src={product.image || "/Logo.jpg"} alt={product.name} />
-               <div className="product-info">
-                 <h3>{product.name}</h3>
-                 <p>{product.description}</p>
-                 <div className="price">Ksh {product.price}</div>
-                 {currentUser ? (
-                   <button
-                     style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
-                     onClick={() => {
-                       const phone = '254790999150';
-                       const message = encodeURIComponent(
-                         `Hello, I want to buy the ${product.name} (Ksh ${product.price}).`
-                       );
-                       window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-                     }}
-                   >
-                     Buy via WhatsApp
-                   </button>
-                 ) : (
-                   <button
-                     style={{ background: '#ff9500', color: 'white', marginLeft: '8px', marginTop: '4px', cursor: 'pointer' }}
-                     onClick={() => { 
-                       setAuthTab("login"); 
-                       setShowAuth(true); 
-                     }}
-                   >
-                     Log in to Buy
-                   </button>
-                 )}
+         {allProducts.length === 0 ? (
+           <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px", color: "#999" }}>
+             <p>Loading products...</p>
+             <p style={{ fontSize: "0.9em", marginTop: "10px" }}>If products don't appear, try refreshing the page.</p>
+           </div>
+         ) : (
+           allProducts
+             .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
+             .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
+             .map(product => (
+               <div key={product.id} className="product-card">
+                 <img src={product.image || "/Logo.jpg"} alt={product.name} />
+                 <div className="product-info">
+                   <h3>{product.name}</h3>
+                   <p>{product.description}</p>
+                   <div className="price">Ksh {product.price}</div>
+                   {currentUser ? (
+                     <button
+                       style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
+                       onClick={() => {
+                         const phone = '254790999150';
+                         const message = encodeURIComponent(
+                           `Hello, I want to buy the ${product.name} (Ksh ${product.price}).`
+                         );
+                         window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                       }}
+                     >
+                       Buy via WhatsApp
+                     </button>
+                   ) : (
+                     <button
+                       style={{ background: '#ff9500', color: 'white', marginLeft: '8px', marginTop: '4px', cursor: 'pointer' }}
+                       onClick={() => {
+                         setAuthTab("login");
+                         setShowAuth(true);
+                       }}
+                     >
+                       Log in to Buy
+                     </button>
+                   )}
+                 </div>
                </div>
-             </div>
-           ))}
+             ))
+         )}
        </div>
+       {allProducts.length > 0 && (
+         <div style={{ textAlign: "center", marginTop: "20px", padding: "10px", background: "#f0f8ff", borderRadius: "8px" }}>
+           <p style={{ margin: 0, color: "#0066ff", fontSize: "0.9em" }}>
+             ✅ Products loaded successfully! If you don't see them on mobile, try refreshing the page or check your internet connection.
+           </p>
+         </div>
+       )}
      </div>
 
      {showCart && (
