@@ -1224,7 +1224,7 @@ html, body {
   }
 
   .products-section .product-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 
@@ -1289,12 +1289,12 @@ html, body {
   }
 
   .hero-section .carousel .slide {
-    height: 280px !important;
+    height: 320px !important;
     position: relative;
   }
 
   .hero-section .carousel img {
-    max-height: 280px;
+    max-height: 320px;
     object-fit: cover;
   }
 
@@ -1335,6 +1335,7 @@ html, body {
   .brand img {
     height: 24px;
     width: 24px;
+    filter: brightness(1.2);
   }
 
   .header-center {
