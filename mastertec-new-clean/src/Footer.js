@@ -11,11 +11,11 @@ const Footer = () => (
         Mastervision Technologies provides expert security solutions (CCTV, alarms, access control, electric fences, and more), serving homes and businesses in Nairobi with professional installation and service.<br />
         WhatsApp:{" "}
         <a href="https://wa.me/254790999150?text=Hello%20Mastertec%20Solutions" target="_blank" rel="noopener noreferrer">
-          <FaWhatsapp style={{ verticalAlign: "middle", color: "#25d366" }} /> 0790999150
+          <FaWhatsapp style={{ verticalAlign: "middle", color: "#25d366" }} /> <span style={{ color: "#ff9500" }}>0790999150</span>
         </a><br />
         Email:{" "}
         <a href="mailto:mastertecltd@gmail.com" target="_blank" rel="noopener noreferrer">
-          mastertecltd@gmail.com
+          <span style={{ color: "#ff9500" }}>mastertecltd@gmail.com</span>
         </a>
       </p>
     </div>
