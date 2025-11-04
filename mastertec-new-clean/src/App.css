@@ -1288,8 +1288,12 @@ html, body {
     min-height: 40px;
   }
 
+  .hero-section {
+    min-height: auto !important;
+  }
+
   .hero-section .carousel .slide {
-    height: 400px !important;
+    height: 300px !important;
     position: relative;
   }
 
@@ -1300,32 +1304,36 @@ html, body {
   }
 
   .legend {
-    width: 90% !important;
-    max-width: 90% !important;
-    padding: 12px 10px !important;
-    top: 45% !important;
+    width: 95% !important;
+    max-width: 95% !important;
+    padding: 16px 14px !important;
+    top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     z-index: 10 !important;
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(32, 101, 236, 0.2) 0%, rgba(0, 0, 0, 0.9) 100%) !important;
   }
 
   .legend h2 {
-    font-size: 1rem !important;
-    margin-bottom: 4px !important;
-    letter-spacing: 0.3px;
-    line-height: 1.2;
+    font-size: 1.3rem !important;
+    margin-bottom: 8px !important;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+    word-break: break-word;
   }
 
   .legend p {
-    font-size: 0.7rem !important;
-    line-height: 1.2;
-    margin-bottom: 6px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.4;
+    margin-bottom: 10px !important;
+    word-break: break-word;
   }
 
   .legend .cta-btn {
-    padding: 5px 12px;
-    font-size: 0.65rem;
-    margin-top: 4px;
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    margin-top: 6px;
   }
 
   .brand {
