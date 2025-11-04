@@ -1289,13 +1289,14 @@ html, body {
   }
 
   .hero-section .carousel .slide {
-    height: 320px !important;
+    height: 400px !important;
     position: relative;
   }
 
   .hero-section .carousel img {
-    max-height: 320px;
-    object-fit: cover;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
   }
 
   .legend {
