@@ -1119,7 +1119,7 @@ const addNewProduct = async (e) => {
      <div id="products" className="products-section">
        <h2>Our Products</h2>
        <div className="product-grid">
-         {allProducts.length === 0 ? null : allProducts
+         {allProducts
              .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
              .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
              .map(product => (
@@ -1156,15 +1156,8 @@ const addNewProduct = async (e) => {
                  </div>
                </div>
              ))
-         )}
+         }
        </div>
-       {allProducts.length > 0 && (
-         <div style={{ textAlign: "center", marginTop: "20px", padding: "10px", background: "#f0f8ff", borderRadius: "8px" }}>
-           <p style={{ margin: 0, color: "#0066ff", fontSize: "0.9em" }}>
-             ✅ Products loaded successfully! If you don't see them on mobile, try refreshing the page or check your internet connection.
-           </p>
-         </div>
-       )}
      </div>
 
      {showCart && (
