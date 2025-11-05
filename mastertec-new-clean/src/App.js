@@ -425,7 +425,8 @@ const signupUser = async (e) => {
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) throw error;
     fetchProducts();
-    alert("Product deleted successfully!");
+    fetchReports(); // Update reports including total products count
+    alert("✅ Product deleted successfully!");
   } catch (err) {
     alert("Error deleting product: " + err.message);
   }
@@ -510,6 +511,7 @@ const addSampleProducts = async () => {
     
     alert(`✅ Added ${successCount} sample products!`);
     fetchProducts();
+    fetchReports(); // Update reports including total products count
   } catch (err) {
     alert("Error adding sample products: " + err.message);
   }
@@ -542,9 +544,11 @@ const addNewProduct = async (e) => {
       setPreviewImageAdd(null);
       setShowAddModal(false);
       fetchProducts(); // Refresh product list
+      fetchReports(); // Update reports including total products count
     } else {
       alert("⚠️ Product was created but no data was returned. Please refresh to see your product.");
       fetchProducts();
+      fetchReports();
     }
   } catch (err) {
     console.error("Error adding product:", err);
@@ -583,6 +587,8 @@ const addNewProduct = async (e) => {
     setPreviewImageEdit(null);
     setShowEditModal(false);
     fetchProducts();
+    fetchReports(); // Update reports after product edit
+    alert("✅ Product updated successfully!");
   } catch (err) {
     alert("Error updating product: " + err.message);
   }
