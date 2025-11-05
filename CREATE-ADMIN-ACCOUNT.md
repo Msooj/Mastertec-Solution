@@ -15,7 +15,7 @@ You need an admin account with the `role: 'admin'` metadata to access the admin 
 2. **Create a New User**
    - Click "Add User" or "Invite User"
    - Enter:
-     - Email: `admin@mastertec.com` (or your email)
+     - Email: `mastertecltd@gmail.com` (or your email)
      - Password: Create a strong password
    - Click "Create User"
 
@@ -54,7 +54,7 @@ You need an admin account with the `role: 'admin'` metadata to access the admin 
    
    UPDATE auth.users
    SET raw_user_meta_data = raw_user_meta_data || '{"role": "admin"}'::jsonb
-   WHERE email = 'admin@mastertec.com';
+   WHERE email = 'mastertecltd@gmail.com';
    ```
 
 3. **Replace the email** with your admin email
@@ -132,14 +132,14 @@ You can create multiple admin accounts by:
 
 1. Go to Supabase → Authentication → Users
 2. Click "Add User"
-3. Email: `admin@mastertec.com`
-4. Password: `Admin123!` (change this!)
+3. Email: `mastertecltd@gmail.com`
+4. Password: `@Toronto.24`
 5. After creating, edit user
 6. Add metadata: `{"role": "admin"}`
 7. Save
 8. Go to your website
 9. Click "Admin Sign In"
-10. Enter: `admin@mastertec.com` / `Admin123!`
+10. Enter: `mastertecltd@gmail.com` / `@Toronto.24`
 11. ✅ You're in!
 
 ---

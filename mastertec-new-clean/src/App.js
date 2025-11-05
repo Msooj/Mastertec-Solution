@@ -86,22 +86,22 @@ function App() {
   const heroSlides = [
     {
       image: "/cctv_installation.jpg",
-      title: "CCTV Installation",
-      description: "Secure your premises with expert CCTV setup!",
+      title: "Professional CCTV Installation Services",
+      description: "Protect your property with state-of-the-art CCTV systems. Our expert technicians provide complete installation, configuration, and setup of high-definition surveillance cameras for homes and businesses. Enjoy 24/7 monitoring, remote access, HD recording, and professional maintenance support for comprehensive security coverage.",
       alt: "CCTV Installation",
       category: "CCTV"
     },
     {
       image: "/Electric_fencing.jpg",
-      title: "Electric Fencing",
-      description: "Perimeter protection with professional electric fencing installation!",
+      title: "Electric Fencing Installation & Maintenance",
+      description: "Secure your perimeter with our professional electric fencing solutions. We provide complete installation of durable, high-quality fencing systems, thorough testing, and ongoing maintenance support. Designed for maximum protection and reliability for residential and commercial properties.",
       alt: "Electric Fencing",
       category: "Electric Fencing"
     },
     {
       image: "/Alarm_systems.jpg",
-      title: "Alarm Systems",
-      description: "Keep your property safe with advanced alarm systems!",
+      title: "Advanced Alarm System Installation",
+      description: "Stay protected with our cutting-edge alarm system solutions. Our certified technicians install and configure state-of-the-art alarm systems with 24/7 monitoring, instant alerts, and professional response capabilities. Complete peace of mind for your residential or commercial property.",
       alt: "Alarm Systems",
       category: "Alarms"
     }
@@ -339,18 +339,32 @@ const signupUser = async (e) => {
  const handleAdminLogin = async (e) => {
   e.preventDefault();
   setAdminLoginError("");
+  const email = e.target.email.value;
+  const password = e.target.password.value;
+
   try {
-    const email = e.target.email?.value || e.target.name?.value; // Support both email and name field
-    const password = e.target.password.value;
-    
-    // Try to sign in with Supabase Auth
+    // Try backend admin login first
+    const response = await axios.post(`${API_URL}/admin/login`, { email, password });
+    if (response.data) {
+      setCurrentUser({ email: response.data.email, name: response.data.name });
+      setIsAdmin(true);
+      setShowAdmin(false);
+      setAdminLoginError("");
+      return;
+    }
+  } catch (backendErr) {
+    console.log("Backend login failed, trying Supabase...", backendErr.message);
+  }
+
+  // Fallback to Supabase Auth
+  try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password
     });
-    
+
     if (error) throw error;
-    
+
     // Check if user has admin role in metadata
     if (data.user && data.user.user_metadata && data.user.user_metadata.role === 'admin') {
       setCurrentUser(data.user);
@@ -725,7 +739,11 @@ const addNewProduct = async (e) => {
               placeholder="Search products..."
               value={search}
               onChange={e => setSearch(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && document.querySelector('.products-section')?.scrollIntoView({ behavior: 'smooth' })}
             />
+            <button className="search-btn" onClick={() => document.querySelector('.products-section')?.scrollIntoView({ behavior: 'smooth' })}>
+              🔍
+            </button>
           </div>
           <div className="nav-actions">
             {!isAdmin && (
@@ -1059,10 +1077,10 @@ const addNewProduct = async (e) => {
  ) : (
    <>
      {/* Non-admin content goes here */}
-     <div className="hero-section" style={{ width: '100%', margin: '0 auto' }}>
-       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={5000}>
+     <div className="hero-section" style={{ width: '100%', margin: '0 auto', position: 'relative' }}>
+       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={5000} style={{ position: 'relative' }}>
          {heroSlides.map((slide, index) => (
-           <div key={index}>
+           <div key={index} style={{ position: 'relative' }}>
              <img src={slide.image} alt={slide.alt} />
              <div className="legend">
                <h2>{slide.title}</h2>
@@ -1077,6 +1095,14 @@ const addNewProduct = async (e) => {
      </div>
 
      <div className="category-tabs">
+       <button
+         key="All"
+         className={`cat-btn${selectedCat === "All" ? " cat-selected" : ""}`}
+         onClick={() => setSelectedCat("All")}
+       >
+         <span className="cat-icon">🔍</span>
+         All
+       </button>
        {categories.map(cat => (
          <button
            key={cat}
@@ -1096,7 +1122,10 @@ const addNewProduct = async (e) => {
          {allProducts
            .filter(product => {
              const discountPrice = product.discountPrice || product.discountprice;
-             return discountPrice && parseFloat(discountPrice) < parseFloat(product.price || 0);
+             const hasDiscount = discountPrice && parseFloat(discountPrice) < parseFloat(product.price || 0);
+             const matchesCategory = selectedCat === "All" || product.category === selectedCat;
+             const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
+             return hasDiscount && matchesCategory && matchesSearch;
            })
            .map(product => {
              const discountPrice = product.discountPrice || product.discountprice;

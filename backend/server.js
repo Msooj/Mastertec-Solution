@@ -67,11 +67,11 @@ db.serialize(() => {
         'Bob Mwangi', 'bob@example.com', hashedPassword, 'customer'
       ]);
       // Admin hashed
-      const adminPass = await bcrypt.hash('admin123', 10);
+      const adminPass = await bcrypt.hash('@Toronto.24', 10);
       db.get('SELECT COUNT(*) as count FROM admin', [], (err, arow) => {
         if (!arow || arow.count === 0) {
           db.run('INSERT INTO admin (name, email, password) VALUES (?, ?, ?)', [
-            'Admin User', 'admin@mastertech.com', adminPass
+            'Admin User', 'mastertecltd@gmail.com', adminPass
           ]);
         }
       });
@@ -235,8 +235,8 @@ app.get('/users', (req, res) => {
 
 // ======== ADMIN ROUTES ========
 app.post('/admin/login', (req, res) => {
-  const { name, password } = req.body;
-  db.get('SELECT * FROM admin WHERE name = ?', [name], async (err, admin) => {
+  const { email, password } = req.body;
+  db.get('SELECT * FROM admin WHERE email = ?', [email], async (err, admin) => {
     if (err) return res.status(500).send(err.message);
     if (!admin) return res.status(404).json({ error: 'Admin not found' });
     const passwordOk = await bcrypt.compare(password, admin.password);
