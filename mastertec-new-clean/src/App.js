@@ -1119,13 +1119,7 @@ const addNewProduct = async (e) => {
      <div id="products" className="products-section">
        <h2>Our Products</h2>
        <div className="product-grid">
-         {allProducts.length === 0 ? (
-           <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px", color: "#999" }}>
-             <p>Loading products...</p>
-             <p style={{ fontSize: "0.9em", marginTop: "10px" }}>If products don't appear, try refreshing the page.</p>
-           </div>
-         ) : (
-           allProducts
+         {allProducts.length === 0 ? null : allProducts
              .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
              .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
              .map(product => (

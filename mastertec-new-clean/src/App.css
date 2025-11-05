@@ -90,6 +90,9 @@ html, body {
   height: 36px;
   width: 36px;
   object-fit: contain;
+  opacity: 1 !important;
+  filter: none !important;
+  brightness: 1 !important;
 }
 .brand:hover { color: var(--accent-orange); }
 
@@ -895,6 +898,8 @@ html, body {
   .brand img {
     height: 32px;
     width: 32px;
+    opacity: 1 !important;
+    filter: none !important;
   }
 
   .search-bar {
@@ -1071,6 +1076,8 @@ html, body {
   .brand img {
     height: 28px;
     width: 28px;
+    opacity: 1 !important;
+    filter: none !important;
   }
 
   .header-center {
@@ -1226,6 +1233,11 @@ html, body {
     flex-shrink: 0;
   }
 
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.8rem !important;
+  }
+
   .products-section .product-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
@@ -1286,9 +1298,14 @@ html, body {
   }
 
   .cat-btn {
-    font-size: 0.75rem;
-    padding: 0.5em 0.4em;
-    min-height: 40px;
+    font-size: 0.65rem;
+    padding: 0.35em 0.3em;
+    min-height: 32px;
+  }
+
+  .cat-btn .cat-icon {
+    margin-right: 2px;
+    font-size: 0.8rem;
   }
 
   .hero-section {
@@ -1348,6 +1365,10 @@ html, body {
   .brand img {
     height: 20px;
     width: 20px;
+    opacity: 1 !important;
+    filter: none !important;
+    brightness: 1 !important;
+    box-shadow: none !important;
   }
 
   .header-center {
