@@ -1205,22 +1205,25 @@ html, body {
 /* Mobile Phones (max 480px) */
 @media (max-width: 480px) {
   .navbar-content {
-    gap: 0.3rem;
-    padding: 0.6rem 0.4rem;
-    min-height: 65px;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    gap: 0.2rem;
+    padding: 0.5rem 0.3rem;
+    min-height: 50px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
   }
 
   .header-center {
-    order: 3;
-    flex-basis: 100%;
-    margin-top: 0.5rem;
+    flex: 1;
+    min-width: 0;
+    margin-top: 0;
+    order: 0;
   }
 
   .nav-actions {
-    order: 2;
-    gap: 0.2rem;
+    order: 0;
+    gap: 0.15rem;
+    flex-shrink: 0;
   }
 
   .products-section .product-grid {
@@ -1337,60 +1340,56 @@ html, body {
   }
 
   .brand {
-    font-size: 0.85rem;
-    gap: 0.2rem;
+    font-size: 0.75rem;
+    gap: 0.15rem;
+    flex-shrink: 0;
   }
 
   .brand img {
-    height: 24px;
-    width: 24px;
-    filter: brightness(1.2);
+    height: 20px;
+    width: 20px;
   }
 
   .header-center {
-    flex: 1 1 0;
-    min-width: 80px;
-    padding-left: 0.2rem;
-    padding-right: 0.2rem;
+    flex: 1;
+    min-width: 60px;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
   }
 
   .search-bar {
-    min-width: 100px;
-    max-width: 180px;
-    font-size: 0.85rem;
-    height: 30px;
-    padding: 0.2em 0.6em;
+    min-width: 70px;
+    max-width: 120px;
+    font-size: 0.75rem;
+    height: 28px;
+    padding: 0.15em 0.4em;
   }
 
   .search-btn {
-    font-size: 0.8rem;
-    padding: 0 0.6rem;
-    height: 30px;
+    font-size: 0.7rem;
+    padding: 0 0.4rem;
+    height: 28px;
   }
 
   .auth-btn, .cart-btn-style, .admin-btn-style, .contact-btn-style {
-    font-size: 0.75rem;
-    padding: 0.3em 0.6em;
-    max-width: 75px;
-    min-width: 35px;
+    font-size: 0.65rem;
+    padding: 0.25em 0.5em;
+    max-width: 65px;
+    min-width: 32px;
     height: auto;
-    min-height: 32px;
-  }
-
-  .nav-actions {
-    gap: 0.2rem;
+    min-height: 28px;
   }
 
   .cart-count {
     width: 0.9em;
     height: 0.9em;
     font-size: 0.55rem;
-    top: 5px;
-    right: 6px;
+    top: 3px;
+    right: 4px;
   }
 
   .hero-section {
-    min-height: calc(100vh - 65px);
+    min-height: calc(100vh - 50px);
     padding: 1rem 0.8rem;
   }
 
@@ -1474,7 +1473,7 @@ html, body {
   }
 
   .products-section .product-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.8rem;
   }
 
