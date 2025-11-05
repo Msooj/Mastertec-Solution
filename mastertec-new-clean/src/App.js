@@ -222,24 +222,35 @@ function App() {
   };
   const fetchReports = async () => {
     try {
-      // Fetch from Supabase
+      // Fetch from Supabase with proper error handling
       const { count: productCount, error: productError } = await supabase
         .from("products")
         .select("*", { count: "exact", head: true });
+      if (productError) console.warn("Product count error:", productError);
       
       const { count: userCount, error: userError } = await supabase
         .from("users")
         .select("*", { count: "exact", head: true });
+      if (userError) console.warn("User count error:", userError);
       
-      const { count: orderCount, error: orderError } = await supabase
-        .from("orders")
-        .select("*", { count: "exact", head: true })
-        .catch(() => ({ count: 0, error: null }));
+      let orderCount = 0;
+      let ordersData = [];
       
-      const { data: ordersData } = await supabase
-        .from("orders")
-        .select("total")
-        .catch(() => ({ data: [] }));
+      // Try to fetch orders
+      try {
+        const { count, error: orderError } = await supabase
+          .from("orders")
+          .select("*", { count: "exact", head: true });
+        if (orderError) console.warn("Order count error:", orderError);
+        orderCount = count || 0;
+        
+        const { data } = await supabase.from("orders").select("total");
+        ordersData = data || [];
+      } catch (orderErr) {
+        console.warn("Error fetching orders:", orderErr);
+        orderCount = 0;
+        ordersData = [];
+      }
       
       const totalSales = (ordersData || []).reduce((sum, order) => sum + (parseFloat(order?.total) || 0), 0);
       
@@ -256,7 +267,14 @@ function App() {
         const response = await axios.get(`${API_URL}/reports/summary`);
         setReportsData(response.data || {});
       } catch (backendErr) {
-        setReportsData(null);
+        console.error("Backend fallback failed:", backendErr);
+        // Set default values if everything fails
+        setReportsData({
+          totalOrders: 0,
+          totalSales: 0,
+          totalUsers: 0,
+          totalProducts: 0
+        });
       }
     }
   };
