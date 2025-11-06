@@ -1106,7 +1106,7 @@ const addNewProduct = async (e) => {
    <>
      {/* Non-admin content goes here */}
      <div className="hero-section" style={{ width: '100%', margin: '0 auto', position: 'relative' }}>
-       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={5000} transitionEffect="slideInRight">
+       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={window.innerWidth <= 768 ? 9000 : 7000} transitionEffect="fade">
          {heroSlides.map((slide, index) => (
            <div key={index} style={{ position: 'relative', width: '100%', height: window.innerWidth <= 480 ? '300px' : window.innerWidth <= 768 ? '280px' : '400px', overflow: 'visible' }}>
              <img src={slide.image} alt={slide.alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
