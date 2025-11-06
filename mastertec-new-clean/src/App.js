@@ -116,6 +116,30 @@ function App() {
     { id: 6, name: "Consultation", description: "Free security consultation for your property", emoji: "💼" }
   ];
 
+  // Handle URL routing for /admin
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const path = window.location.pathname;
+      if (path === "/admin" || path === "/admin/") {
+        setShowAdmin(true);
+      } else {
+        setShowAdmin(false);
+      }
+    };
+
+    handleUrlChange();
+    window.addEventListener("popstate", handleUrlChange);
+    return () => window.removeEventListener("popstate", handleUrlChange);
+  }, []);
+
+  // Navigate to admin when showAdmin changes
+  useEffect(() => {
+    if (showAdmin && !window.location.pathname.includes("/admin")) {
+      window.history.pushState({}, "", "/admin");
+    } else if (!showAdmin && window.location.pathname.includes("/admin")) {
+      window.history.pushState({}, "", "/");
+    }
+  }, [showAdmin]);
 
   useEffect(() => {
     console.log("App mounted, fetching products...");
@@ -828,7 +852,11 @@ const addNewProduct = async (e) => {
       )}
       {isAdmin ? (
         <div className="admin-area">
-          <button className="shop-btn" style={{ marginBottom: 20 }} onClick={() => setIsAdmin(false)}>
+          <button className="shop-btn" style={{ marginBottom: 20 }} onClick={() => {
+            setIsAdmin(false);
+            setShowAdmin(false);
+            window.history.pushState({}, "", "/");
+          }}>
             <FiArrowLeft /> Back to Shop
           </button>
           <div className="admin-tabs" style={{ display: "flex", gap: 20, marginBottom: 20 }}>
@@ -1078,10 +1106,10 @@ const addNewProduct = async (e) => {
    <>
      {/* Non-admin content goes here */}
      <div className="hero-section" style={{ width: '100%', margin: '0 auto', position: 'relative' }}>
-       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={5000} style={{ position: 'relative' }}>
+       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={5000} transitionEffect="slideInRight">
          {heroSlides.map((slide, index) => (
-           <div key={index} style={{ position: 'relative' }}>
-             <img src={slide.image} alt={slide.alt} />
+           <div key={index} style={{ position: 'relative', width: '100%', height: '600px', overflow: 'visible' }}>
+             <img src={slide.image} alt={slide.alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
              <div className="legend">
                <h2>{slide.title}</h2>
                <p>{slide.description}</p>
