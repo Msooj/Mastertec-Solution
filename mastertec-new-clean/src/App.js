@@ -1108,7 +1108,7 @@ const addNewProduct = async (e) => {
      <div className="hero-section" style={{ width: '100%', margin: '0 auto', position: 'relative' }}>
        <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={5000} transitionEffect="slideInRight">
          {heroSlides.map((slide, index) => (
-           <div key={index} style={{ position: 'relative', width: '100%', height: '600px', overflow: 'visible' }}>
+           <div key={index} style={{ position: 'relative', width: '100%', height: window.innerWidth <= 480 ? '300px' : window.innerWidth <= 768 ? '280px' : '400px', overflow: 'visible' }}>
              <img src={slide.image} alt={slide.alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
              <div className="legend">
                <h2>{slide.title}</h2>
@@ -1126,7 +1126,7 @@ const addNewProduct = async (e) => {
        <button
          key="All"
          className={`cat-btn${selectedCat === "All" ? " cat-selected" : ""}`}
-         onClick={() => setSelectedCat("All")}
+         onClick={() => { setSelectedCat("All"); document.querySelector('.deals-section')?.scrollIntoView({ behavior: 'smooth' }); }}
        >
          <span className="cat-icon">🔍</span>
          All
@@ -1135,7 +1135,7 @@ const addNewProduct = async (e) => {
          <button
            key={cat}
            className={`cat-btn${selectedCat === cat ? " cat-selected" : ""}`}
-           onClick={() => setSelectedCat(cat)}
+           onClick={() => { setSelectedCat(cat); document.querySelector('.deals-section')?.scrollIntoView({ behavior: 'smooth' }); }}
          >
            <span className="cat-icon">{categoryIcons[cat]}</span>
            {cat}

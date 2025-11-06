@@ -206,7 +206,8 @@ html, body {
   background: #000;
   text-align: center;
   padding: 0;
-  min-height: calc(100vh - 100px);
+  margin-bottom: 0;
+  min-height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -226,13 +227,33 @@ html, body {
   overflow: visible !important;
   display: block !important;
   height: auto !important;
-  min-height: 600px;
+  min-height: 400px;
   clip-path: none !important;
 }
 
 .hero-section .carousel .carousel-slider {
   overflow: visible !important;
-  height: 600px !important;
+  height: 400px !important;
+}
+
+@media (max-width: 768px) {
+  .hero-section .carousel {
+    min-height: 280px;
+  }
+  
+  .hero-section .carousel .carousel-slider {
+    height: 280px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section .carousel {
+    min-height: 300px;
+  }
+  
+  .hero-section .carousel .carousel-slider {
+    height: 300px !important;
+  }
 }
 
 .hero-section .carousel .carousel-slider > div {
@@ -243,7 +264,7 @@ html, body {
 .hero-section .carousel .slide {
   position: relative;
   width: 100%;
-  min-height: 600px;
+  min-height: 400px;
   height: auto !important;
   display: flex;
   align-items: center;
@@ -251,6 +272,18 @@ html, body {
   overflow: visible !important;
   z-index: 1;
   clip-path: none !important;
+}
+
+@media (max-width: 768px) {
+  .hero-section .carousel .slide {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section .carousel .slide {
+    min-height: 300px;
+  }
 }
 
 .hero-section .carousel > div {
@@ -261,8 +294,20 @@ html, body {
   align-items: center;
   justify-content: center;
   height: auto !important;
-  min-height: 600px;
+  min-height: 400px;
   clip-path: none !important;
+}
+
+@media (max-width: 768px) {
+  .hero-section .carousel > div {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section .carousel > div {
+    min-height: 300px;
+  }
 }
 
 /* Target slide wrapper divs to prevent clipping */
@@ -310,49 +355,48 @@ html, body {
 
 /* Enhanced Legend Box */
 .legend {
-  background: linear-gradient(135deg, rgba(32, 101, 236, 0.15) 0%, rgba(0, 0, 0, 0.85) 100%);
-  backdrop-filter: blur(20px);
-  padding: 40px 80px;
-  border-radius: 25px;
-  width: 80%;
-  max-width: 900px;
-  min-width: 300px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 40px 45px;
+  border-radius: 8px;
+  width: 40%;
+  max-width: 520px;
+  min-width: 280px;
   text-align: center;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(32, 101, 236, 0.4);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9);
   animation: fadeInScale 0.6s ease-out;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  max-height: 70vh;
+  max-height: 85%;
   overflow-y: auto;
   position: absolute !important;
   top: 50% !important;
-  right: 5% !important;
+  right: 3% !important;
   left: auto !important;
   transform: translate(0%, -50%) !important;
-  z-index: 1000 !important;
+  z-index: 5 !important;
 }
 
 @media (max-width: 768px) {
   .legend {
-    padding: 30px 40px;
-    width: 85%;
-    max-width: 500px;
+    padding: 30px 25px;
+    width: 80%;
+    max-width: 400px;
     right: 2% !important;
-    max-height: 50vh;
+    transform: translate(0%, -50%) !important;
+    max-height: 80%;
   }
 }
 
 @media (max-width: 480px) {
   .legend {
-    padding: 20px 25px;
+    padding: 20px 16px;
     width: 90%;
-    max-width: 320px;
-    right: 50% !important;
-    transform: translate(50%, -50%) !important;
-    max-height: 40vh;
+    max-width: 280px;
+    right: 2% !important;
+    transform: translate(0%, -50%) !important;
+    max-height: 80%;
   }
 }
 
@@ -381,50 +425,47 @@ html, body {
 
 .legend h2 {
   color: #ffffff !important;
-  font-size: 2.2rem !important;
+  font-size: 2rem !important;
   font-weight: 900 !important;
-  margin: 0 0 10px 0 !important;
+  margin: 0 !important;
   padding: 0 !important;
-  margin-bottom: 15px !important;
   text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9), 0 0 25px rgba(32, 101, 236, 0.4);
-  line-height: 1.3;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  background: linear-gradient(135deg, #ffffff 0%, #b0d9ff 100%);
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
   word-break: break-word;
   overflow: visible !important;
   display: block !important;
   box-sizing: border-box !important;
   white-space: normal !important;
   max-width: 100% !important;
+  margin-bottom: 12px !important;
 }
 
 @media (max-width: 768px) {
   .legend h2 {
-    font-size: 1.8rem !important;
-    letter-spacing: 0.8px;
+    font-size: 1.4rem !important;
+    letter-spacing: 0.3px;
+    margin-bottom: 10px !important;
   }
 }
 
 @media (max-width: 480px) {
   .legend h2 {
-    font-size: 1.3rem !important;
-    letter-spacing: 0.3px;
+    font-size: 1.05rem !important;
+    letter-spacing: 0.1px;
+    margin-bottom: 10px !important;
   }
 }
 
 .legend p {
   color: #ffffff !important;
-  font-size: 1.1rem !important;
-  margin: 15px 0 30px 0 !important;
-  padding: 0 15px !important;
+  font-size: 0.95rem !important;
+  margin: 12px 0 20px 0 !important;
+  padding: 0 !important;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-  line-height: 1.9;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  line-height: 1.6;
+  font-weight: 500;
+  letter-spacing: 0.2px;
   word-break: break-word;
   overflow: visible !important;
   display: block !important;
@@ -438,38 +479,25 @@ html, body {
 
 @media (max-width: 768px) {
   .legend p {
-    font-size: 0.95rem !important;
-    line-height: 1.6;
-    margin: 12px 0 20px 0 !important;
-    padding: 0 12px !important;
+    font-size: 0.85rem !important;
+    line-height: 1.5;
+    margin: 10px 0 15px 0 !important;
+    padding: 0 !important;
   }
 }
 
 @media (max-width: 480px) {
   .legend p {
-    font-size: 0.8rem !important;
-    line-height: 1.5;
-    margin: 10px 0 15px 0 !important;
-    padding: 0 10px !important;
+    font-size: 0.78rem !important;
+    line-height: 1.4;
+    margin: 8px 0 12px 0 !important;
+    padding: 0 !important;
   }
 }
 
 /* CTA Button in Legend */
 .legend .cta-btn {
-  display: inline-block;
-  background: linear-gradient(135deg, #ea580c 0%, #ff7a2e 100%);
-  color: #fff;
-  padding: 12px 30px;
-  border-radius: 50px;
-  border: none;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 8px 25px rgba(234, 88, 12, 0.4);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-top: 10px;
+  display: none;
 }
 
 .legend .cta-btn:hover {
@@ -477,6 +505,15 @@ html, body {
   box-shadow: 0 12px 35px rgba(234, 88, 12, 0.6);
   background: linear-gradient(135deg, #ff7a2e 0%, #ff9200 100%);
 }
+
+@media (max-width: 480px) {
+  .legend .cta-btn {
+    padding: 8px 16px;
+    font-size: 0.7rem;
+    margin-top: 8px;
+  }
+}
+
 .hero-section h1 {
   font-size: 3.5rem;
   font-weight: 700;
@@ -517,11 +554,14 @@ html, body {
 /* --- CATEGORY TABS: EXACTLY 2 ROWS, TEXT INSIDE BUTTONS --- */
 .category-tabs {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.8em 0.6em;
   max-width: 1200px;
-  margin: 0 auto 0.8em auto;
+  margin: 100px auto 40px auto;
   padding: 0 1rem;
+  position: relative;
+  z-index: 10;
+  clear: both;
 }
 
 /* Responsive for tablets and smaller screens */
@@ -598,18 +638,38 @@ html, body {
 
 .products-section h2 {
   text-align: center;
-  color: #0066ff;
+  color: #1a1a2e;
   margin-bottom: 2rem !important;
   margin-top: 0 !important;
   padding-top: 0 !important;
+  font-size: 2.2rem;
+  font-weight: 700;
 }
 
 .products-section .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+@media (max-width: 1024px) {
+  .products-section .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .products-section .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .products-section .product-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
 
 
@@ -632,38 +692,85 @@ html, body {
   padding: 1.24rem 1.1rem 1.07rem 1.1rem;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 .product-info h3 {
   font-size: 1.16rem;
   font-weight: 600;
-  color: var(--primary-blue);
-  margin-bottom: 0.18rem;
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  margin: 0 0 0.5rem 0;
 }
+
+.products-section .product-info h3 {
+  color: #1a1a2e;
+}
+
 .product-info p {
   font-size: 0.97rem;
-  color: #485274;
+  color: #666666;
   margin-bottom: 0.69rem;
   flex: 1;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.products-section .product-info p {
+  color: #666666;
 }
 .price {
   font-size: 1.25rem;
   font-weight: bold;
-  color: var(--accent-orange);
+  color: var(--primary-blue);
   margin-bottom: 0.5em;
+}
+
+.products-section .price {
+  color: var(--primary-blue);
+}
+
+.deals-section .price {
+  color: var(--accent-orange);
 }
 .product-info button {
   background: var(--accent-orange);
   color: #fff;
   border: none;
-  border-radius: 1.5em;
-  padding: 0.49em 1.12em;
-  font-weight: 500;
+  border-radius: 25px;
+  padding: 0.7em 1.2em;
+  font-weight: 600;
   cursor: pointer;
-  margin-top: 0.25em;
-  transition: background 0.14s;
+  margin-top: auto;
+  transition: background 0.2s;
+  width: 100%;
+  font-size: 0.95rem;
 }
 .product-info button:hover {
-  background: var(--primary-blue);
+  background: #ff8c00;
+}
+
+.products-section .product-info button {
+  background: var(--accent-orange);
+  font-weight: 600;
+  margin-top: auto;
+}
+
+.products-section .product-info button:hover {
+  background: #ff8c00;
+}
+
+.deals-section .product-info button {
+  background: var(--accent-orange);
+  font-weight: 600;
+  margin-top: auto;
+}
+
+.deals-section .product-info button:hover {
+  background: #ff8c00;
 }
 
 /* --- DEALS & DISCOUNTS SECTION --- */
@@ -671,7 +778,11 @@ html, body {
 .deals-section {
   padding: 2rem;
   background: #f9f9f9;
-  margin: 2rem 0;
+  margin: 80px 0 2rem 0;
+  scroll-margin-top: 100px;
+  clear: both;
+  position: relative;
+  z-index: 2;
 }
 
 @media (max-width: 480px) {
@@ -685,6 +796,9 @@ html, body {
   text-align: center;
   color: #ff8800;
   margin-bottom: 1.5rem;
+  margin-top: 0;
+  font-size: 2rem;
+  font-weight: bold;
 }
 
 .deals-section .product-grid {
@@ -706,6 +820,42 @@ html, body {
 .deals-section .product-card {
   flex: none;
   width: 100%;
+}
+
+/* Deals section product styling */
+.deals-section .product-info h3 {
+  color: var(--primary-blue) !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 0 0.5rem 0 !important;
+  border-radius: 0;
+}
+
+.deals-section .product-info p {
+  color: #666666 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0;
+}
+
+.deals-section .price {
+  display: flex;
+  flex-direction: row;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+  align-items: center;
+}
+
+.deals-section .discounted-price {
+  color: var(--accent-orange);
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.deals-section .original-price {
+  color: #999999;
+  text-decoration: line-through;
+  font-size: 0.95rem;
 }
 
 /* Optional: Hide scrollbar for cleaner look */
