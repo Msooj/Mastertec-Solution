@@ -104,6 +104,20 @@ function App() {
       description: "Stay protected with our cutting-edge alarm system solutions. Our certified technicians install and configure state-of-the-art alarm systems with 24/7 monitoring, instant alerts, and professional response capabilities. Complete peace of mind for your residential or commercial property.",
       alt: "Alarm Systems",
       category: "Alarms"
+    },
+    {
+      image: "/Gate_automatic.jpg",
+      title: "Automatic Gate Installation",
+      description: "Experience the convenience and security of automated gate systems. Our expert technicians design and install reliable automatic gate solutions for residential and commercial properties. Complete with professional setup, safety features, and maintenance support for seamless operation.",
+      alt: "Automatic Gate Installation",
+      category: "Access Control"
+    },
+    {
+      image: "/Design.jpg",
+      title: "DESIGN. SUPPLY. INSTALL. MAINTAIN.",
+      description: "",
+      alt: "Design Supply Install Maintain",
+      category: "Services"
     }
   ];
 
@@ -1106,7 +1120,7 @@ const addNewProduct = async (e) => {
    <>
      {/* Non-admin content goes here */}
      <div className="hero-section" style={{ width: '100%', margin: '0 auto', position: 'relative' }}>
-       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={window.innerWidth <= 768 ? 9000 : 7000} transitionEffect="fade">
+       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={window.innerWidth <= 768 ? 12000 : 10000} transitionEffect="fade">
          {heroSlides.map((slide, index) => (
            <div key={index} style={{ position: 'relative', width: '100%', height: window.innerWidth <= 480 ? '300px' : window.innerWidth <= 768 ? '280px' : '400px', overflow: 'visible' }}>
              <img src={slide.image} alt={slide.alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
