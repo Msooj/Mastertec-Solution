@@ -2107,3 +2107,26 @@ html, body {
     min-height: 350px !important;
   }
 }
+
+/* Additional fix for hero-slide-image */
+.hero-section .hero-slide-image {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 500px !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* Fix hero-slide container */
+.hero-section .hero-slide {
+  min-height: 500px !important;
+  height: auto !important;
+  position: relative !important;
+}
+
+/* Ensure hero section has proper height */
+.hero-section {
+  min-height: 500px !important;
+  height: auto !important;
+  background: #000 !important;
+}
