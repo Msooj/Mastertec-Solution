@@ -321,7 +321,7 @@ html, body {
 
 .hero-section .carousel .carousel-slider {
   overflow: visible !important;
-  height: 320px !important;
+  height: auto !important;
 }
 
 @media (max-width: 768px) {
@@ -330,7 +330,7 @@ html, body {
   }
   
   .hero-section .carousel .carousel-slider {
-    height: 220px !important;
+    height: auto !important;
   }
 }
 
@@ -340,7 +340,7 @@ html, body {
   }
   
   .hero-section .carousel .carousel-slider {
-    height: 200px !important;
+    height: auto !important;
   }
 }
 
