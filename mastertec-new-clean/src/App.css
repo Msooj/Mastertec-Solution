@@ -2076,3 +2076,34 @@ html, body {
 .legend {
   overflow: visible !important;
 }
+
+/* Ensure carousel slides have proper height for image display */
+.hero-section .carousel .slide {
+  min-height: 500px !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ensure images display at full size */
+.hero-section .carousel .slide img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* Ensure carousel slider has adequate height */
+.hero-section .carousel-slider {
+  min-height: 500px !important;
+  height: auto !important;
+}
+
+/* Mobile responsive heights */
+@media (max-width: 768px) {
+  .hero-section .carousel .slide,
+  .hero-section .carousel-slider {
+    min-height: 350px !important;
+  }
+}
