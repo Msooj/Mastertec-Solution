@@ -1948,8 +1948,8 @@ html, body {
 .carousel-root,
 .carousel .slider,
 .carousel .slider-wrapper {
-  overflow: hidden !important;
-}
+  overflow-x: hidden !important;
+  overflow-y: visible !important;}
 
 /* Keep legend visible to allow text boxes to extend outside */
 .legend {
