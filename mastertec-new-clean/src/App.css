@@ -1940,3 +1940,18 @@ html, body {
   overflow: visible !important;
   position: relative;
 }
+
+/* FIX: Carousel should clip to one slide at a time */
+.hero-section .carousel,
+.hero-section .carousel .carousel-slider,
+.hero-section .carousel .slider-wrapper,
+.carousel-root,
+.carousel .slider,
+.carousel .slider-wrapper {
+  overflow: hidden !important;
+}
+
+/* Keep legend visible to allow text boxes to extend outside */
+.legend {
+  overflow: visible !important;
+}
