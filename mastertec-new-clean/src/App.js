@@ -85,7 +85,7 @@ function App() {
 
   const heroSlides = [
     {
-      image: "/cctv_installation.jpg",
+      image: `${process.env.PUBLIC_URL}/cctv_installation.jpg`,
       title: "Professional CCTV Installation Services",
       description: "Protect your property with state-of-the-art CCTV systems. Our expert technicians provide complete installation, configuration, and setup of high-definition surveillance cameras for homes and businesses. Enjoy 24/7 monitoring, remote access, HD recording, and professional maintenance support for comprehensive security coverage.",
       alt: "CCTV Installation",
