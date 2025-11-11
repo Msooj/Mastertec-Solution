@@ -113,6 +113,20 @@ function App() {
       category: "Access Control"
     },
     {
+      image: "/intercom.jpg",
+      title: "Intercom & PABX Communication Systems",
+      description: "Boost productivity with customized intercom and PABX setups for offices, estates, and enterprises. Enjoy crystal-clear calls, centralized management, and specialist support from installation to maintenance.",
+      alt: "Intercom and PABX Service",
+      category: "Telephone"
+    },
+    {
+      image: "/structured cabling.jpg",
+      title: "Structured Cabling Solutions",
+      description: "Deploy enterprise-grade structured cabling for dependable voice, data, and security networks with expert design, certification, and maintenance services.",
+      alt: "Structured Cabling Service",
+      category: "Networking"
+    },
+    {
       image: "/Design.jpg",
       title: "DESIGN. SUPPLY. INSTALL. MAINTAIN.",
       description: "",
@@ -1122,8 +1136,8 @@ const addNewProduct = async (e) => {
      <div className="hero-section" style={{ width: '100%', margin: '0 auto', position: 'relative' }}>
        <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={window.innerWidth <= 768 ? 12000 : 10000} transitionEffect="fade">
          {heroSlides.map((slide, index) => (
-           <div key={index} style={{ position: 'relative', width: '100%', height: window.innerWidth <= 480 ? '300px' : window.innerWidth <= 768 ? '280px' : '400px', overflow: 'visible' }}>
-             <img src={slide.image} alt={slide.alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+           <div key={index} className="hero-slide">
+             <img src={slide.image} alt={slide.alt} className="hero-slide-image" />
              <div className="legend">
                <h2>{slide.title}</h2>
                <p>{slide.description}</p>
