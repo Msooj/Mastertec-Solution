@@ -17,6 +17,9 @@ const Footer = () => (
         <a href="mailto:mastertecltd@gmail.com" target="_blank" rel="noopener noreferrer">
           <span style={{ color: "#ff9500" }}>mastertecltd@gmail.com</span>
         </a>
+        <br />
+        Developer Contact:{" "}
+        <a href="tel:0787444894" style={{ color: "#ff9500" }}>0787444894</a>
       </p>
     </div>
     <div className="footer-socials">

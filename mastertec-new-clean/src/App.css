@@ -63,7 +63,7 @@ html, body {
   align-items: center;
   justify-content: flex-start;
   gap: 1.2rem;
-  padding: 0;
+  padding: 0.8rem 1rem; 
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -291,85 +291,16 @@ html, body {
 
 /* --- HERO SECTION --- */
 .hero-section {
-  background: #000;
-  text-align: center;
-  padding: 0 !important;
-  margin: 0;
-  min-height: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   width: 100%;
-  max-width: 100%;
-  overflow: visible !important;
-  position: relative;
-  z-index: 1;
-  clip-path: none !important;
-}
-
-/* Carousel and Legend Styles */
-.hero-section .carousel {
-  position: relative;
-  width: 100%;
-  overflow: visible !important;
-  display: block !important;
-  height: auto !important;
-  min-height: 320px;
-  clip-path: none !important;
-}
-
-.hero-section .carousel .carousel-slider {
-  overflow: visible !important;
-  height: auto !important;
-}
-
-@media (max-width: 768px) {
-  .hero-section .carousel {
-    min-height: 220px;
-  }
-  
-  .hero-section .carousel .carousel-slider {
-    height: auto !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-section .carousel {
-    min-height: 200px;
-  }
-  
-  .hero-section .carousel .carousel-slider {
-    height: auto !important;
-  }
-}
-
-.hero-section .carousel .carousel-slider > div {
-  overflow: visible !important;
-  position: relative !important;
-}
-
-.hero-section .carousel .slide {
-  position: relative;
-  width: 100%;
-  min-height: 320px;
-  height: auto !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible !important;
-  z-index: 1;
-  clip-path: none !important;
+  height: auto; /* Let content decide height */
 }
 
 .hero-slide {
   position: relative;
   width: 100%;
-  min-height: 320px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  height: 60vh; /* Use viewport height for responsiveness */
+  min-height: 300px;
+  max-height: 500px;
 }
 
 .hero-slide-image {
@@ -378,317 +309,58 @@ html, body {
   object-fit: cover;
 }
 
-@media (max-width: 768px) {
-  .hero-section .carousel .slide {
-    min-height: 220px;
-  }
-
-  .hero-slide {
-    min-height: 220px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-section .carousel .slide {
-    min-height: 200px;
-  }
-
-  .hero-slide {
-    min-height: 180px;
-  }
-}
-
-.hero-section .carousel > div {
-  position: relative;
-  width: 100%;
-  overflow: visible !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: auto !important;
-  min-height: 320px;
-  clip-path: none !important;
-}
-
-@media (max-width: 768px) {
-  .hero-section .carousel > div {
-    min-height: 220px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-section .carousel > div {
-    min-height: 200px;
-  }
-}
-
-/* Target slide wrapper divs to prevent clipping */
-.hero-section .carousel > div > div {
-  overflow: visible !important;
-  clip-path: none !important;
-  height: auto !important;
-}
-
-.hero-section .carousel > div > div > div {
-  overflow: visible !important;
-  clip-path: none !important;
-  height: auto !important;
-}
-
-/* Hero carousel images */
-.hero-section img {
-  display: block !important;
-  animation: slideZoom 0.8s ease-out;
-}
-
-@keyframes slideZoom {
-  from {
-    transform: scale(1.05);
-    opacity: 0.8;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Dark Overlay */
-.hero-section .carousel .slide::before {
-  content: '';
+.hero-legend {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: transparent;
-  z-index: 2;
-  pointer-events: none;
-}
-
-/* Enhanced Legend Box */
-.legend {
-  background: rgba(0, 0, 0, 0.88);
-  padding: 40px 45px;
-  border-radius: 8px;
-  width: 40%;
-  max-width: 520px;
-  min-width: 280px;
-  text-align: center;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.95);
-  animation: fadeInScale 0.6s ease-out;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  max-height: 85%;
-  overflow-y: auto;
-  position: absolute !important;
-  top: 50% !important;
-  right: 3% !important;
-  left: auto !important;
-  transform: translate(0%, -50%) !important;
-  z-index: 5 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-@media (max-width: 768px) {
-  .legend {
-    padding: 30px 25px;
-    width: 80%;
-    max-width: 400px;
-    right: 2% !important;
-    left: 50% !important;
-    top: auto !important;
-    bottom: 12% !important;
-    transform: translate(-50%, 0) !important;
-    max-height: 80%;
-    background: rgba(0, 0, 0, 0.90) !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .legend {
-    padding: 20px 16px;
-    width: 90%;
-    max-width: 280px;
-    right: 5% !important;
-    left: 50% !important;
-    top: auto !important;
-    bottom: 8% !important;
-    transform: translate(-50%, 0) !important;
-    max-height: 80%;
-    background: rgba(0, 0, 0, 0.92) !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-}
-
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.legend::after {
-  content: '';
-  position: absolute;
-  top: -2px;
+  bottom: 10%;
   left: 50%;
   transform: translateX(-50%);
-  width: 60%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(32, 101, 236, 0.8), transparent);
-  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 80%;
+  max-width: 600px;
+  z-index: 10;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
-.legend h2 {
-  color: #ffffff !important;
-  font-size: 2rem !important;
-  font-weight: 900 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9), 0 0 25px rgba(32, 101, 236, 0.4);
-  line-height: 1.2;
-  letter-spacing: 0.5px;
-  word-break: break-word;
-  overflow: visible !important;
-  display: block !important;
-  box-sizing: border-box !important;
-  white-space: normal !important;
-  max-width: 100% !important;
-  margin-bottom: 12px !important;
+.hero-legend h2 {
+  font-size: 2rem;
+  margin: 0 0 10px;
+}
+
+.hero-legend p {
+  font-size: 1rem;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
-  .legend h2 {
-    font-size: 1.4rem !important;
-    letter-spacing: 0.3px;
-    margin-bottom: 10px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9), 0 0 25px rgba(32, 101, 236, 0.4) !important;
+  .hero-slide {
+    height: 50vh;
+  }
+  .hero-legend h2 {
+    font-size: 1.5rem;
+  }
+  .hero-legend p {
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 480px) {
-  .legend h2 {
-    font-size: 1.05rem !important;
-    letter-spacing: 0.1px;
-    margin-bottom: 10px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(32, 101, 236, 0.5) !important;
+  .hero-slide {
+    height: 40vh;
   }
-}
-
-.legend p {
-  color: #ffffff !important;
-  font-size: 0.95rem !important;
-  margin: 12px 0 20px 0 !important;
-  padding: 0 !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-  line-height: 1.6;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-  word-break: break-word;
-  overflow: visible !important;
-  display: block !important;
-  box-sizing: border-box !important;
-  white-space: normal !important;
-  max-width: 100% !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  width: 100% !important;
-}
-
-@media (max-width: 768px) {
-  .legend p {
-    font-size: 0.85rem !important;
-    line-height: 1.5;
-    margin: 10px 0 15px 0 !important;
-    padding: 0 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8) !important;
-    color: #ffffff !important;
+  .hero-legend {
+    padding: 15px;
+    width: 90%;
   }
-}
-
-@media (max-width: 480px) {
-  .legend p {
-    font-size: 0.78rem !important;
-    line-height: 1.4;
-    margin: 8px 0 12px 0 !important;
-    padding: 0 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9) !important;
-    color: #ffffff !important;
+  .hero-legend h2 {
+    font-size: 1.4rem;
   }
-}
-
-/* CTA Button in Legend */
-.legend .cta-btn {
-  display: none;
-}
-
-.legend .cta-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 35px rgba(234, 88, 12, 0.6);
-  background: linear-gradient(135deg, #ff7a2e 0%, #ff9200 100%);
-}
-
-@media (max-width: 480px) {
-  .legend .cta-btn {
-    padding: 8px 16px;
-    font-size: 0.7rem;
-    margin-top: 8px;
+  .hero-legend p {
+    font-size: 1rem;
   }
-}
-
-.hero-section h1 {
-  font-size: 3.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3), 1px 1px 3px rgba(32, 101, 236, 0.5);
-  margin-bottom: 1.5rem;
-  max-width: 900px;
-}
-.hero-section p {
-  color: #ffffff;
-  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.25), 1px 1px 2px rgba(32, 101, 236, 0.4);
-  font-size: 1.3rem;
-  margin-bottom: 2.5rem;
-  max-width: 700px;
-}
-.shop-btn {
-  display: inline-block;
-  background: var(--primary-blue);
-  color: #fff;
-  font-weight: 600;
-  padding: 1.1rem 3rem;
-  border-radius: 30px;
-  font-size: 1.2rem;
-  margin-top: 1rem;
-  transition: all 0.3s;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(32, 101, 236, 0.3);
-}
-.shop-btn:hover {
-  background: var(--accent-orange);
-  color: #fff;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 25px rgba(255, 149, 0, 0.4);
 }
 
 /* --- CATEGORY TABS: EXACTLY 2 ROWS, TEXT INSIDE BUTTONS --- */
@@ -1269,7 +941,7 @@ html, body {
     max-height: 700px;
   }
 
-  .legend {
+  .hero-legend {
     max-width: 1000px;
     padding: 60px 80px !important;
     top: 50% !important;
@@ -1814,7 +1486,7 @@ html, body {
     object-fit: cover !important;
   }
 
-  .legend {
+  .hero-legend {
     width: 95% !important;
     max-width: 95% !important;
     padding: 16px 14px !important;
@@ -1827,7 +1499,7 @@ html, body {
     background: linear-gradient(135deg, rgba(32, 101, 236, 0.2) 0%, rgba(0, 0, 0, 0.9) 100%) !important;
   }
 
-  .legend h2 {
+  .hero-legend h2 {
     font-size: 1.3rem !important;
     margin-bottom: 8px !important;
     letter-spacing: 0.5px;
@@ -1835,14 +1507,14 @@ html, body {
     word-break: break-word;
   }
 
-  .legend p {
+  .hero-legend p {
     font-size: 0.9rem !important;
     line-height: 1.4;
     margin-bottom: 10px !important;
     word-break: break-word;
   }
 
-  .legend .cta-btn {
+  .hero-legend .cta-btn {
     padding: 8px 18px;
     font-size: 0.8rem;
     margin-top: 6px;
@@ -2015,118 +1687,4 @@ html, body {
   color: var(--primary-blue);
 }
 
-/* OVERRIDE - Ensure hero section text is fully visible */
-.hero-section,
-.hero-section .carousel,
-.hero-section .carousel .slide,
-.hero-section .carousel > div,
-.hero-section .carousel > div > div,
-.legend {
-  overflow: visible !important;
-}
 
-/* React Carousel Library Overrides */
-.carousel-root,
-.carousel-wrapper,
-.carousel-container,
-.carousel-slider,
-.carousel .slider-wrapper,
-.carousel .slider,
-.carousel .slider-container,
-.carousel .slide,
-.hero-section .carousel,
-.hero-section .carousel .slide,
-.hero-section .carousel > div,
-.hero-section .carousel > div > div,
-.hero-section .carousel > div > div > div,
-.hero-section .carousel > div > div > div > div {
-  overflow: visible !important;
-  height: auto !important;
-  min-height: auto !important;
-}
-
-/* Force no max-height on carousel children */
-.carousel-root *,
-.carousel-wrapper *,
-.carousel-container *,
-.carousel-slider *,
-.hero-section .carousel * {
-  max-height: none !important;
-  overflow-y: visible !important;
-  overflow-x: visible !important;
-}
-
-/* Ensure legend slide container doesn't clip content */
-.hero-section .carousel .slide {
-  overflow: visible !important;
-  position: relative;
-}
-
-/* FIX: Carousel should clip to one slide at a time */
-.hero-section .carousel,
-.hero-section .carousel .carousel-slider,
-.hero-section .carousel .slider-wrapper,
-.carousel-root,
-.carousel .slider,
-.carousel .slider-wrapper {
-  overflow-x: hidden !important;
-  overflow-y: visible !important;}
-
-/* Keep legend visible to allow text boxes to extend outside */
-.legend {
-  overflow: visible !important;
-}
-
-/* Ensure carousel slides have proper height for image display */
-.hero-section .carousel .slide {
-  min-height: 500px !important;
-  height: auto !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-/* Ensure images display at full size */
-.hero-section .carousel .slide img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-}
-
-/* Ensure carousel slider has adequate height */
-.hero-section .carousel-slider {
-  min-height: 500px !important;
-  height: auto !important;
-}
-
-/* Mobile responsive heights */
-@media (max-width: 768px) {
-  .hero-section .carousel .slide,
-  .hero-section .carousel-slider {
-    min-height: 350px !important;
-  }
-}
-
-/* Additional fix for hero-slide-image */
-.hero-section .hero-slide-image {
-  width: 100% !important;
-  height: auto !important;
-  min-height: 500px !important;
-  object-fit: cover !important;
-  display: block !important;
-}
-
-/* Fix hero-slide container */
-.hero-section .hero-slide {
-  min-height: 500px !important;
-  height: auto !important;
-  position: relative !important;
-}
-
-/* Ensure hero section has proper height */
-.hero-section {
-  min-height: 500px !important;
-  height: auto !important;
-  background: #000 !important;
-}

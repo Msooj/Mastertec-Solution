@@ -8,6 +8,7 @@ import "./App.css";
 import "./AdminStyles.css";
 import { FaWhatsapp } from "react-icons/fa";
 import Footer from "./Footer";
+import ProductCard from "./ProductCard";
 import { supabase } from "./supabaseClient";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Carousel CSS
@@ -65,13 +66,13 @@ function App() {
     category: categories[0],
     description: "",
     inventory: 10,
-    image: ""
+    images: []
   });
   const [editProduct, setEditProduct] = useState(null);
 
 
-  const [previewImageAdd, setPreviewImageAdd] = useState(null);
-  const [previewImageEdit, setPreviewImageEdit] = useState(null);
+  const [previewImagesAdd, setPreviewImagesAdd] = useState([]);
+  const [previewImagesEdit, setPreviewImagesEdit] = useState([]);
   const [adminEmail, setAdminEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [checkoutDetails, setCheckoutDetails] = useState({ phone: "", address: "" });
@@ -84,56 +85,56 @@ function App() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const heroSlides = [
-    {
-      image: `${process.env.PUBLIC_URL}/cctv_installation.jpg`,
-      title: "Professional CCTV Installation Services",
-      description: "Protect your property with state-of-the-art CCTV systems. Our expert technicians provide complete installation, configuration, and setup of high-definition surveillance cameras for homes and businesses. Enjoy 24/7 monitoring, remote access, HD recording, and professional maintenance support for comprehensive security coverage.",
-      alt: "CCTV Installation",
-      category: "CCTV"
-    },
-    {
-      image: "/Electric_fencing.jpg",
-      title: "Electric Fencing Installation & Maintenance",
-      description: "Secure your perimeter with our professional electric fencing solutions. We provide complete installation of durable, high-quality fencing systems, thorough testing, and ongoing maintenance support. Designed for maximum protection and reliability for residential and commercial properties.",
-      alt: "Electric Fencing",
-      category: "Electric Fencing"
-    },
-    {
-      image: "/Alarm_systems.jpg",
-      title: "Advanced Alarm System Installation",
-      description: "Stay protected with our cutting-edge alarm system solutions. Our certified technicians install and configure state-of-the-art alarm systems with 24/7 monitoring, instant alerts, and professional response capabilities. Complete peace of mind for your residential or commercial property.",
-      alt: "Alarm Systems",
-      category: "Alarms"
-    },
-    {
-      image: "/Gate_automatic.jpg",
-      title: "Automatic Gate Installation",
-      description: "Experience the convenience and security of automated gate systems. Our expert technicians design and install reliable automatic gate solutions for residential and commercial properties. Complete with professional setup, safety features, and maintenance support for seamless operation.",
-      alt: "Automatic Gate Installation",
-      category: "Access Control"
-    },
-    {
-      image: "/intercom.jpg",
-      title: "Intercom & PABX Communication Systems",
-      description: "Boost productivity with customized intercom and PABX setups for offices, estates, and enterprises. Enjoy crystal-clear calls, centralized management, and specialist support from installation to maintenance.",
-      alt: "Intercom and PABX Service",
-      category: "Telephone"
-    },
-    {
-      image: "/structured cabling.jpg",
-      title: "Structured Cabling Solutions",
-      description: "Deploy enterprise-grade structured cabling for dependable voice, data, and security networks with expert design, certification, and maintenance services.",
-      alt: "Structured Cabling Service",
-      category: "Networking"
-    },
-    {
-      image: "/Design.jpg",
-      title: "DESIGN. SUPPLY. INSTALL. MAINTAIN.",
-      description: "",
-      alt: "Design Supply Install Maintain",
-      category: "Services"
-    }
-  ];
+  {
+    image: "/cctv_installation.jpg",
+    title: "Professional CCTV Installation Services",
+    description: "Protect your property with state-of-the-art CCTV systems. Our expert technicians provide complete installation, configuration, and setup of high-definition surveillance cameras for homes and businesses. Enjoy 24/7 monitoring, remote access, HD recording, and professional maintenance support for comprehensive security coverage.",
+    alt: "CCTV Installation",
+    category: "CCTV"
+  },
+  {
+    image: "/Electric_fencing.jpg",
+    title: "Electric Fencing Installation & Maintenance",
+    description: "Secure your perimeter with our professional electric fencing solutions. We provide complete installation of durable, high-quality fencing systems, thorough testing, and ongoing maintenance support. Designed for maximum protection and reliability for residential and commercial properties.",
+    alt: "Electric Fencing",
+    category: "Electric Fencing"
+  },
+  {
+    image: "/Alarm_systems.jpg",
+    title: "Advanced Alarm System Installation",
+    description: "Stay protected with our cutting-edge alarm system solutions. Our certified technicians install and configure state-of-the-art alarm systems with 24/7 monitoring, instant alerts, and professional response capabilities. Complete peace of mind for your residential or commercial property.",
+    alt: "Alarm Systems",
+    category: "Alarms"
+  },
+  {
+    image: "/Gate_automatic.jpg",
+    title: "Automatic Gate Installation",
+    description: "Experience the convenience and security of automated gate systems. Our expert technicians design and install reliable automatic gate solutions for residential and commercial properties. Complete with professional setup, safety features, and maintenance support for seamless operation.",
+    alt: "Automatic Gate Installation",
+    category: "Access Control"
+  },
+  {
+    image: "/intercom.jpg",
+    title: "Intercom & PABX Communication Systems",
+    description: "Boost productivity with customized intercom and PABX setups for offices, estates, and enterprises. Enjoy crystal-clear calls, centralized management, and specialist support from installation to maintenance.",
+    alt: "Intercom and PABX Service",
+    category: "Telephone"
+  },
+  {
+    image: "/structured cabling.jpg",
+    title: "Structured Cabling Solutions",
+    description: "Deploy enterprise-grade structured cabling for dependable voice, data, and security networks with expert design, certification, and maintenance services.",
+    alt: "Structured Cabling Service",
+    category: "Networking"
+  },
+  {
+    image: "/Design.jpg",
+    title: "DESIGN. SUPPLY. INSTALL. MAINTAIN.",
+    description: "Comprehensive technology lifecycle support from initial concept to ongoing maintenance and optimization.",
+    alt: "Design Supply Install Maintain",
+    category: "Services"
+  }
+];
 
   const services = [
     { id: 1, name: "CCTV Installation", description: "Professional CCTV system setup and installation", emoji: "📹" },
@@ -471,16 +472,7 @@ const signupUser = async (e) => {
 
   const addToCart = (product, e) => {
     e?.preventDefault();
-    if (!currentUser && !isAdmin) {
-      // Show login prompt if not logged in
-      setShowCart(false);
-      setAuthTab("login");
-      setShowAuth(true);
-      alert("Please log in or sign up to add items to cart.");
-      return;
-    }
-    
-    // Get the button element for animation
+    // Allow adding to cart without requiring login
     const button = e?.target;
     if (button) {
       const rect = button.getBoundingClientRect();
@@ -490,12 +482,11 @@ const signupUser = async (e) => {
         startX: rect.left + rect.width / 2,
         startY: rect.top + rect.height / 2
       });
-      
-      // Remove animation state after animation completes
+
       setTimeout(() => {
         setFlyingProduct(null);
         setCart([...cart, product]);
-      }, 800); // Animation duration
+      }, 800);
     } else {
       setCart([...cart, product]);
     }
@@ -518,28 +509,35 @@ const signupUser = async (e) => {
 
 
   const handleAddImageChange = e => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        setPreviewImageAdd(evt.target.result);
-        setNewProduct({ ...newProduct, image: evt.target.result });
-      };
-      reader.readAsDataURL(file);
-    }
+    const files = Array.from(e.target.files);
+    const readers = files.map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (evt) => resolve(evt.target.result);
+        reader.readAsDataURL(file);
+      });
+    });
+    Promise.all(readers).then(images => {
+      setPreviewImagesAdd([...previewImagesAdd, ...images]);
+      setNewProduct({ ...newProduct, images: [...newProduct.images, ...images] });
+    });
   };
 
 
   const handleEditImageChange = e => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        setPreviewImageEdit(evt.target.result);
-        setEditProduct({ ...editProduct, image: evt.target.result });
-      };
-      reader.readAsDataURL(file);
-    }
+    const files = Array.from(e.target.files);
+    const readers = files.map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (evt) => resolve(evt.target.result);
+        reader.readAsDataURL(file);
+      });
+    });
+    Promise.all(readers).then(images => {
+      const currentImages = Array.isArray(editProduct.images) ? editProduct.images : (editProduct.image ? [editProduct.image] : []);
+      setPreviewImagesEdit([...currentImages, ...images]);
+      setEditProduct({ ...editProduct, images: [...currentImages, ...images] });
+    });
   };
 const addSampleProducts = async () => {
   const sampleProducts = [
@@ -611,7 +609,7 @@ const addNewProduct = async (e) => {
       category: newProduct.category,
       description: newProduct.description,
       inventory: parseInt(newProduct.inventory),
-      image: newProduct.image || "/Logo.jpg"
+      image: newProduct.images.length > 0 ? JSON.stringify(newProduct.images) : "/Logo.jpg"
     };
     
     const { data, error } = await supabase.from("products").insert([productData]).select();
@@ -624,11 +622,11 @@ const addNewProduct = async (e) => {
     
     if (data && data.length > 0) {
       alert("✅ Product successfully added to Supabase!");
-      setNewProduct({ name: "", price: "", discountPrice: "", category: categories[0], description: "", inventory: 10, image: "" });
-      setPreviewImageAdd(null);
+      setNewProduct({ name: "", price: "", discountPrice: "", category: categories[0], description: "", inventory: 10, images: [] });
+      setPreviewImagesAdd([]);
       setShowAddModal(false);
-      fetchProducts(); // Refresh product list
-      fetchReports(); // Update reports including total products count
+      fetchProducts();
+      fetchReports();
     } else {
       alert("⚠️ Product was created but no data was returned. Please refresh to see your product.");
       fetchProducts();
@@ -643,13 +641,19 @@ const addNewProduct = async (e) => {
 
 
   const startEdit = (product) => {
-    // Normalize discountPrice field
+    let images = [];
+    try {
+      images = product.image && product.image.startsWith('[') ? JSON.parse(product.image) : [product.image || '/Logo.jpg'];
+    } catch {
+      images = [product.image || '/Logo.jpg'];
+    }
     const normalizedProduct = {
       ...product,
-      discountPrice: product.discountPrice || product.discountprice || ""
+      discountPrice: product.discountPrice || product.discountprice || "",
+      images: images
     };
     setEditProduct(normalizedProduct);
-    setPreviewImageEdit(product.image || null);
+    setPreviewImagesEdit(images);
     setShowEditModal(true);
   };
 
@@ -657,21 +661,23 @@ const addNewProduct = async (e) => {
   const updateProduct = async (e) => {
   e.preventDefault();
   try {
-    const { error } = await supabase.from("products").update({
+    const updateData = {
       name: editProduct.name,
       price: parseFloat(editProduct.price),
       discountprice: editProduct.discountPrice ? parseFloat(editProduct.discountPrice) : null,
       category: editProduct.category,
       description: editProduct.description,
       inventory: parseInt(editProduct.inventory),
-      image: editProduct.image
-    }).eq("id", editProduct.id);
+      image: editProduct.images && editProduct.images.length > 0 ? JSON.stringify(editProduct.images) : '/Logo.jpg'
+    };
+    
+    const { error } = await supabase.from("products").update(updateData).eq("id", editProduct.id);
     if (error) throw error;
     setEditProduct(null);
-    setPreviewImageEdit(null);
+    setPreviewImagesEdit([]);
     setShowEditModal(false);
     fetchProducts();
-    fetchReports(); // Update reports after product edit
+    fetchReports();
     alert("✅ Product updated successfully!");
   } catch (err) {
     alert("Error updating product: " + err.message);
@@ -798,26 +804,7 @@ const addNewProduct = async (e) => {
             </button>
           </div>
           <div className="nav-actions">
-            {!isAdmin && (
-              <button className="auth-btn"
-                onClick={() => {
-                  if (currentUser) {
-                    logout();
-                  } else {
-                    setAuthTab("login"); setShowAuth(true);
-                  }
-                }}>
-                Account {currentUser ? "Log Out" : ""}
-                <FiUser style={{ marginLeft: 7 }} />
-              </button>
-            )}
-            {!isAdmin && (
-              <button className="auth-btn" onClick={() => setShowCart(true)}>
-                <span className="react-icon"><FiShoppingCart /></span>
-                <span className="cart-count">{cart.length}</span>
-              </button>
-            )}
-            <button
+                                    <button
               className="auth-btn"
               onClick={() => {
                 const aboutFooter = document.getElementById("about-footer");
@@ -913,9 +900,20 @@ const addNewProduct = async (e) => {
                       required onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} />
                     <input type="text" placeholder="Discount Price" value={newProduct.discountPrice}
                       onChange={e => setNewProduct({ ...newProduct, discountPrice: e.target.value })} />
-                    <input type="file" accept="image/*"
+                    <input type="file" accept="image/*" multiple
                       onChange={handleAddImageChange} />
-                    {previewImageAdd && <img src={previewImageAdd} alt="Preview" style={{ maxWidth: "100px", marginBottom: "10px" }} />}
+                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                      {previewImagesAdd.map((img, i) => (
+                        <div key={i} style={{ position: 'relative' }}>
+                          <img src={img} alt="Preview" style={{ width: "60px", height: "60px", objectFit: "cover" }} />
+                          <button type="button" onClick={() => {
+                            const newImages = previewImagesAdd.filter((_, idx) => idx !== i);
+                            setPreviewImagesAdd(newImages);
+                            setNewProduct({ ...newProduct, images: newImages });
+                          }} style={{ position: 'absolute', top: 0, right: 0, background: 'red', color: 'white', border: 'none', cursor: 'pointer', padding: '2px 5px' }}>×</button>
+                        </div>
+                      ))}
+                    </div>
                     <select
                       value={newProduct.category}
                       onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
@@ -930,7 +928,7 @@ const addNewProduct = async (e) => {
                       required onChange={e => setNewProduct({ ...newProduct, inventory: e.target.value })} />
                     <div style={{ display: "flex", gap: 10 }}>
                       <button type="submit" className="admin-btn"><FiPlusCircle /> Add</button>
-                      <button type="button" className="admin-btn" onClick={() => { setShowAddModal(false); setPreviewImageAdd(null); }}>Cancel</button>
+                      <button type="button" className="admin-btn" onClick={() => { setShowAddModal(false); setPreviewImagesAdd([]); }}>Cancel</button>
                     </div>
                   </form>
                 </div>
@@ -942,8 +940,19 @@ const addNewProduct = async (e) => {
                     <input type="text" value={editProduct.name} onChange={e => setEditProduct({ ...editProduct, name: e.target.value })} required />
                     <input type="text" value={editProduct.price} onChange={e => setEditProduct({ ...editProduct, price: e.target.value })} required />
                     <input type="text" value={editProduct.discountPrice || ""} placeholder="Discount Price" onChange={e => setEditProduct({ ...editProduct, discountPrice: e.target.value })} />
-                    <input type="file" accept="image/*" onChange={handleEditImageChange} />
-                    {previewImageEdit && <img src={previewImageEdit} alt="Preview" style={{ maxWidth: "100px", marginBottom: "10px" }} />}
+                    <input type="file" accept="image/*" multiple onChange={handleEditImageChange} />
+                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                      {previewImagesEdit.map((img, i) => (
+                        <div key={i} style={{ position: 'relative' }}>
+                          <img src={img} alt="Preview" style={{ width: "60px", height: "60px", objectFit: "cover" }} />
+                          <button type="button" onClick={() => {
+                            const newImages = previewImagesEdit.filter((_, idx) => idx !== i);
+                            setPreviewImagesEdit(newImages);
+                            setEditProduct({ ...editProduct, images: newImages });
+                          }} style={{ position: 'absolute', top: 0, right: 0, background: 'red', color: 'white', border: 'none', cursor: 'pointer', padding: '2px 5px' }}>×</button>
+                        </div>
+                      ))}
+                    </div>
                     <select value={editProduct.category} onChange={e => setEditProduct({ ...editProduct, category: e.target.value })}>
                       {categories.map(cat => (
                         <option value={cat} key={cat}>{cat}</option>
@@ -953,7 +962,7 @@ const addNewProduct = async (e) => {
                     <input type="number" value={editProduct.inventory} onChange={e => setEditProduct({ ...editProduct, inventory: e.target.value })} required />
                     <div style={{ display: "flex", gap: 10 }}>
                       <button type="submit" className="admin-btn"><FiEdit2 /> Save</button>
-                      <button type="button" className="admin-btn" onClick={() => { setEditProduct(null); setShowEditModal(false); setPreviewImageEdit(null); }}>Cancel</button>
+                      <button type="button" className="admin-btn" onClick={() => { setEditProduct(null); setShowEditModal(false); setPreviewImagesEdit([]); }}>Cancel</button>
                     </div>
                   </form>
                 </div>
@@ -968,8 +977,7 @@ const addNewProduct = async (e) => {
                 </h2>
                 <div className="product-grid">
                   {allProducts.filter(p => p.discountPrice || p.discountprice).map(product => (
-                    <div key={product.id} className="product-card">
-                      <img src={product.image || "/Logo.jpg"} alt={product.name} />
+                    <ProductCard key={product.id} product={product}>
                       <div className="product-info">
                         <h3>{product.name}</h3>
                         <p>{product.description}</p>
@@ -989,7 +997,7 @@ const addNewProduct = async (e) => {
                           <FiTrash2 /> Delete
                         </button>
                       </div>
-                    </div>
+                    </ProductCard>
                   ))}
                   {allProducts.filter(p => p.discountPrice || p.discountprice).length === 0 && (
                     <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "20px", color: "#999" }}>
@@ -1006,8 +1014,7 @@ const addNewProduct = async (e) => {
                 </h2>
                 <div className="product-grid">
                   {allProducts.filter(p => !(p.discountPrice || p.discountprice)).map(product => (
-                    <div key={product.id} className="product-card">
-                      <img src={product.image || "/Logo.jpg"} alt={product.name} />
+                    <ProductCard key={product.id} product={product}>
                       <div className="product-info">
                         <h3>{product.name}</h3>
                         <p>{product.description}</p>
@@ -1023,7 +1030,7 @@ const addNewProduct = async (e) => {
                           <FiTrash2 /> Delete
                         </button>
                       </div>
-                    </div>
+                    </ProductCard>
                   ))}
                   {allProducts.filter(p => !(p.discountPrice || p.discountprice)).length === 0 && (
                     <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "20px", color: "#999" }}>
@@ -1133,17 +1140,14 @@ const addNewProduct = async (e) => {
  ) : (
    <>
      {/* Non-admin content goes here */}
-     <div className="hero-section" style={{ width: '100%', margin: '0 auto', position: 'relative' }}>
-       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} width="100%" onChange={setCurrentSlide} interval={window.innerWidth <= 768 ? 12000 : 10000} transitionEffect="fade">
+     <div className="hero-section">
+       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} interval={5000}>
          {heroSlides.map((slide, index) => (
            <div key={index} className="hero-slide">
              <img src={slide.image} alt={slide.alt} className="hero-slide-image" />
-             <div className="legend">
+             <div className="hero-legend">
                <h2>{slide.title}</h2>
                <p>{slide.description}</p>
-               <button className="cta-btn" onClick={() => { setSelectedCat(slide.category); document.querySelector('.category-tabs')?.scrollIntoView({ behavior: 'smooth' }); }}>
-                 Shop Now
-               </button>
              </div>
            </div>
          ))}
@@ -1186,8 +1190,7 @@ const addNewProduct = async (e) => {
            .map(product => {
              const discountPrice = product.discountPrice || product.discountprice;
              return (
-               <div key={product.id} className="product-card">
-                 <img src={product.image || "/Logo.jpg"} alt={product.name} />
+               <ProductCard key={product.id} product={product}>
                  <div className="product-info">
                    <h3>{product.name}</h3>
                    <div className="price">
@@ -1195,30 +1198,18 @@ const addNewProduct = async (e) => {
                      <span className="original-price">Ksh {product.price}</span>
                    </div>
                    <p>{product.description}</p>
-                   {currentUser ? (
-                     <button
-                       style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
-                       onClick={() => {
-                         const phone = '254790999150';
-                         const message = encodeURIComponent(`Hello, I want to buy the ${product.name} (Ksh ${product.price}).`);
-                         window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-                       }}
-                     >
-                       Order via WhatsApp
-                     </button>
-                   ) : (
-                     <button
-                       style={{ background: '#ff9500', color: 'white', marginLeft: '8px', marginTop: '4px', cursor: 'pointer' }}
-                       onClick={() => { 
-                         setAuthTab("login"); 
-                         setShowAuth(true); 
-                       }}
-                     >
-                       Log in to Buy
-                     </button>
-                   )}
+                   <button
+                     style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
+                     onClick={() => {
+                       const phone = '254790999150';
+                       const message = encodeURIComponent(`Hello, I want to buy the ${product.name} (Ksh ${product.price}).`);
+                       window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                     }}
+                   >
+                     Order via WhatsApp
+                   </button>
                  </div>
-               </div>
+               </ProductCard>
              );
            })}
        </div>
@@ -1232,38 +1223,25 @@ const addNewProduct = async (e) => {
              .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
              .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
              .map(product => (
-               <div key={product.id} className="product-card">
-                 <img src={product.image || "/Logo.jpg"} alt={product.name} />
+               <ProductCard key={product.id} product={product}>
                  <div className="product-info">
                    <h3>{product.name}</h3>
                    <p>{product.description}</p>
                    <div className="price">Ksh {product.price}</div>
-                   {currentUser ? (
-                     <button
-                       style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
-                       onClick={() => {
-                         const phone = '254790999150';
-                         const message = encodeURIComponent(
-                           `Hello, I want to buy the ${product.name} (Ksh ${product.price}).`
-                         );
-                         window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-                       }}
-                     >
-                       Buy via WhatsApp
-                     </button>
-                   ) : (
-                     <button
-                       style={{ background: '#ff9500', color: 'white', marginLeft: '8px', marginTop: '4px', cursor: 'pointer' }}
-                       onClick={() => {
-                         setAuthTab("login");
-                         setShowAuth(true);
-                       }}
-                     >
-                       Log in to Buy
-                     </button>
-                   )}
+                   <button
+                     style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
+                     onClick={() => {
+                       const phone = '254790999150';
+                       const message = encodeURIComponent(
+                         `Hello, I want to buy the ${product.name} (Ksh ${product.price}).`
+                       );
+                       window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                     }}
+                   >
+                     Buy via WhatsApp
+                   </button>
                  </div>
-               </div>
+               </ProductCard>
              ))
          }
        </div>
@@ -1379,7 +1357,7 @@ const addNewProduct = async (e) => {
          )}
 
          <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-           {cartTab === "items" && cart.length > 0 && currentUser && (
+           {cartTab === "items" && cart.length > 0 && (
              <button
                style={{
                  flex: 1,
