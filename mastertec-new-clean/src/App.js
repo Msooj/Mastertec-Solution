@@ -173,7 +173,7 @@ function App() {
   useEffect(() => {
     console.log("App mounted, fetching products...");
     fetchProducts();
-  }, [isAdmin]);
+  }, []);
   useEffect(() => { if (isAdmin && adminTab === "users") fetchUsers(); }, [isAdmin, adminTab]);
   useEffect(() => { if (isAdmin && adminTab === "orders") fetchOrders(); }, [isAdmin, adminTab]);
   useEffect(() => { if (isAdmin && adminTab === "reports") fetchReports(); }, [isAdmin, adminTab]);
@@ -195,6 +195,7 @@ function App() {
       setAllProducts(normalizedProducts);
     } catch (err) {
       console.error("Error fetching products:", err);
+      alert("Error fetching products from Supabase: " + err.message);
       setAllProducts([]);
       // Try fallback to backend if Supabase fails
       try {
@@ -982,10 +983,10 @@ const addNewProduct = async (e) => {
                         <h3>{product.name}</h3>
                         <p>{product.description}</p>
                         <div className="price">
-                          <span style={{ textDecoration: "line-through", color: "#999" }}>Ksh {product.price}</span>
+                          <span style={{ textDecoration: "line-through", color: "#999" }}>Ksh {product.price} (inclusive of tax)</span>
                           <br />
                           <span className="discounted-price" style={{ fontSize: "1.2em", color: "#dc2626", fontWeight: "bold" }}>
-                            Deal: Ksh {product.discountPrice || product.discountprice}
+                            Deal: Ksh {product.discountPrice || product.discountprice} (inclusive of tax)
                           </span>
                         </div>
                       </div>
@@ -1019,7 +1020,7 @@ const addNewProduct = async (e) => {
                         <h3>{product.name}</h3>
                         <p>{product.description}</p>
                         <div className="price">
-                          Ksh {product.price}
+                          Ksh {product.price} (inclusive of tax)
                         </div>
                       </div>
                       <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
@@ -1194,8 +1195,8 @@ const addNewProduct = async (e) => {
                  <div className="product-info">
                    <h3>{product.name}</h3>
                    <div className="price">
-                     <span className="discounted-price">Ksh {discountPrice}</span>
-                     <span className="original-price">Ksh {product.price}</span>
+                     <span className="discounted-price">Ksh {discountPrice} (inclusive of tax)</span>
+                     <span className="original-price">Ksh {product.price} (inclusive of tax)</span>
                    </div>
                    <p>{product.description}</p>
                    <button
@@ -1227,7 +1228,7 @@ const addNewProduct = async (e) => {
                  <div className="product-info">
                    <h3>{product.name}</h3>
                    <p>{product.description}</p>
-                   <div className="price">Ksh {product.price}</div>
+                   <div className="price">Ksh {product.price} (inclusive of tax)</div>
                    <button
                      style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
                      onClick={() => {

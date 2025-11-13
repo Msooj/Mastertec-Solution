@@ -314,14 +314,11 @@ html, body {
   bottom: 10%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 20px;
-  border-radius: 8px;
   text-align: center;
   width: 80%;
   max-width: 600px;
   z-index: 10;
+  color: white;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
@@ -369,7 +366,7 @@ html, body {
   grid-template-columns: repeat(4, 1fr);
   gap: 0.8em 0.6em;
   max-width: 1200px;
-  margin: 60px auto 36px auto;
+  margin: 10px auto 10px auto;
   padding: 0 1rem;
   position: relative;
   z-index: 10;
@@ -381,7 +378,7 @@ html, body {
   .category-tabs {
     grid-template-columns: repeat(4, 1fr);
     gap: 0.6em 0.5em;
-    margin: 48px auto 32px auto;
+    margin: 15px auto 20px auto;
   }
 }
 
@@ -389,7 +386,7 @@ html, body {
   .category-tabs {
     grid-template-columns: repeat(3, 1fr);
     gap: 0.6em 0.5em;
-    margin: 36px auto 28px auto;
+    margin: 10px auto 15px auto;
   }
 }
 
@@ -397,7 +394,7 @@ html, body {
   .category-tabs {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.5em 0.4em;
-    margin: 24px auto 20px auto;
+    margin: 10px auto 10px auto;
   }
 }
 .cat-btn {
@@ -593,7 +590,7 @@ html, body {
 .deals-section {
   padding: 2rem;
   background: #f9f9f9;
-  margin: 80px 0 2rem 0;
+  margin: 20px 0 2rem 0;
   scroll-margin-top: 100px;
   clear: both;
   position: relative;
@@ -1087,7 +1084,7 @@ html, body {
     grid-template-columns: repeat(4, 1fr);
     gap: 0.6em 0.5em;
     max-width: 800px;
-    margin: 0 auto 0.6em auto;
+    margin: 10px auto 0.6em auto;
     padding: 0 0.5rem;
   }
 
@@ -1278,7 +1275,7 @@ html, body {
     grid-template-columns: repeat(3, 1fr);
     gap: 0.5em 0.4em;
     max-width: 100%;
-    margin: 0 auto 0.5em auto;
+    margin: 10px auto 0.5em auto;
     padding: 0 0.3rem;
   }
 
@@ -1578,8 +1575,7 @@ html, body {
   .category-tabs {
     grid-template-columns: repeat(6, 1fr);
     gap: 0.3em 0.2em;
-    max-width: 100%;
-    margin: 0 auto 0.4em auto;
+    margin: 5px auto 0.4em auto;
     padding: 0 0.2rem;
   }
 
