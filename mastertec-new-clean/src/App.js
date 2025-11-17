@@ -1,3 +1,5 @@
+// IMPORTANT: Please read the INSTRUCTIONS.md file in the project root for steps to fix the product loading issue.
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -48,9 +50,10 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminTab, setAdminTab] = useState("products");
+  const [adminSearch, setAdminSearch] = useState("");
   const [adminLoginError, setAdminLoginError] = useState("");
-  const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [reportsData, setReportsData] = useState(null);
@@ -174,12 +177,12 @@ function App() {
     console.log("App mounted, fetching products...");
     fetchProducts();
   }, []);
-  useEffect(() => { if (isAdmin && adminTab === "users") fetchUsers(); }, [isAdmin, adminTab]);
   useEffect(() => { if (isAdmin && adminTab === "orders") fetchOrders(); }, [isAdmin, adminTab]);
   useEffect(() => { if (isAdmin && adminTab === "reports") fetchReports(); }, [isAdmin, adminTab]);
 
 
   const fetchProducts = async () => {
+    setProductsLoading(true);
     try {
       console.log("Fetching products from Supabase...");
       const { data, error } = await supabase.from("products").select("*");
@@ -194,37 +197,26 @@ function App() {
       console.log("Normalized products:", normalizedProducts);
       setAllProducts(normalizedProducts);
     } catch (err) {
-      console.error("Error fetching products:", err);
-      alert("Error fetching products from Supabase: " + err.message);
-      setAllProducts([]);
-      // Try fallback to backend if Supabase fails
+      console.error("Error fetching products from Supabase:", err);
+      // Try backend fallback immediately without alert
       try {
         console.log("Trying backend fallback...");
-        const response = await axios.get(`${API_URL}/products`);
+        const response = await axios.get(`${API_URL}/products`, { timeout: 5000 });
         console.log("Backend products:", response.data);
-        setAllProducts(response.data || []);
+        const normalizedProducts = (response.data || []).map(product => ({
+          ...product,
+          discountPrice: product.discountprice || product.discountPrice || null,
+          price: product.price || 0
+        }));
+        setAllProducts(normalizedProducts);
       } catch (backendErr) {
         console.error("Backend fallback also failed:", backendErr);
+        // Set empty array and show alert only if both fail
         setAllProducts([]);
+        alert("🔴 Error fetching products. Please check your internet connection.");
       }
-    }
-  };
-  const fetchUsers = async () => {
-    try {
-      // Fetch users from Supabase users table
-      const { data, error } = await supabase.from("users").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      setUsers(data || []);
-    } catch (err) {
-      console.error("Error fetching users:", err);
-      // Fallback: try backend API if Supabase fails
-      try {
-        const response = await axios.get(`${API_URL}/users`);
-        setUsers(response.data || []);
-      } catch (backendErr) {
-        console.error("Backend fallback also failed:", backendErr);
-        setUsers([]);
-      }
+    } finally {
+      setProductsLoading(false);
     }
   };
   const fetchOrders = async () => {
@@ -545,10 +537,11 @@ const addSampleProducts = async () => {
     {
       name: "Wireless CCTV Camera",
       price: 6500,
+      discountPrice: 5999,
       category: "CCTV",
       description: "Super HD wireless CCTV for home & business.",
       inventory: 20,
-      image: "/Logo.jpg"
+      image: "/cctv_installation.jpg"
     },
     {
       name: "Smart Alarm System",
@@ -556,7 +549,7 @@ const addSampleProducts = async () => {
       category: "Alarms",
       description: "Protect your property with remotely activated alarms.",
       inventory: 10,
-      image: "/Logo.jpg"
+      image: "/Alarm_systems.jpg"
     },
     {
       name: "Fiber Optic Router",
@@ -564,15 +557,32 @@ const addSampleProducts = async () => {
       category: "Networking",
       description: "Fast, reliable fiber optics for stable internet.",
       inventory: 15,
-      image: "/Logo.jpg"
+      image: "/structured cabling.jpg"
     },
     {
-      name: "Wireless CCTV Camera",
-      price: 6500,
-      category: "CCTV",
-      description: "Super HD wireless CCTV for home & business.",
-      inventory: 20,
-      image: "/Logo.jpg"
+      name: "Electric Fence Energizer",
+      price: 9500,
+      discountPrice: 8999,
+      category: "Electric Fencing",
+      description: "High-voltage energizer for maximum security.",
+      inventory: 12,
+      image: "/Electric_fencing.jpg"
+    },
+    {
+      name: "Automatic Gate Motor",
+      price: 25000,
+      category: "Access Control",
+      description: "Heavy-duty motor for sliding gates.",
+      inventory: 8,
+      image: "/Gate_automatic.jpg"
+    },
+    {
+      name: "Video Intercom System",
+      price: 15000,
+      category: "Telephone",
+      description: "See and speak to visitors from anywhere.",
+      inventory: 18,
+      image: "/intercom.jpg"
     }
   ];
 
@@ -582,7 +592,7 @@ const addSampleProducts = async () => {
       const { error } = await supabase.from("products").insert([{
         name: product.name,
         price: product.price,
-        discountprice: null,
+        discountprice: product.discountPrice || null,
         category: product.category,
         description: product.description,
         inventory: product.inventory,
@@ -877,7 +887,6 @@ const addNewProduct = async (e) => {
           </button>
           <div className="admin-tabs" style={{ display: "flex", gap: 20, marginBottom: 20 }}>
             <button onClick={() => setAdminTab("products")} className={adminTab === "products" ? "admin-tab-selected" : ""}>Products</button>
-            <button onClick={() => setAdminTab("users")} className={adminTab === "users" ? "admin-tab-selected" : ""}>Users</button>
             <button onClick={() => setAdminTab("orders")} className={adminTab === "orders" ? "admin-tab-selected" : ""}>Orders</button>
             <button onClick={() => setAdminTab("reports")} className={adminTab === "reports" ? "admin-tab-selected" : ""}>Reports</button>
           </div>
@@ -989,14 +998,14 @@ const addNewProduct = async (e) => {
                             Deal: Ksh {product.discountPrice || product.discountprice} (Excl. tax)
                           </span>
                         </div>
-                      </div>
-                      <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-                        <button className="admin-btn" onClick={() => startEdit(product)} style={{ flex: 1 }}>
-                          <FiEdit2 /> Edit
-                        </button>
-                        <button className="admin-btn" onClick={() => removeProduct(product.id)} style={{ flex: 1, background: "#dc2626" }}>
-                          <FiTrash2 /> Delete
-                        </button>
+                        <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                          <button className="admin-btn" onClick={() => startEdit(product)} style={{ flex: 1 }}>
+                            <FiEdit2 /> Edit
+                          </button>
+                          <button className="admin-btn" onClick={() => removeProduct(product.id)} style={{ flex: 1, background: "#dc2626" }}>
+                            <FiTrash2 /> Delete
+                          </button>
+                        </div>
                       </div>
                     </ProductCard>
                   ))}
@@ -1022,14 +1031,14 @@ const addNewProduct = async (e) => {
                         <div className="price">
                           Ksh {product.price} (Excl. tax)
                         </div>
-                      </div>
-                      <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-                        <button className="admin-btn" onClick={() => startEdit(product)} style={{ flex: 1 }}>
-                          <FiEdit2 /> Edit
-                        </button>
-                        <button className="admin-btn" onClick={() => removeProduct(product.id)} style={{ flex: 1, background: "#dc2626" }}>
-                          <FiTrash2 /> Delete
-                        </button>
+                        <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                          <button className="admin-btn" onClick={() => startEdit(product)} style={{ flex: 1 }}>
+                            <FiEdit2 /> Edit
+                          </button>
+                          <button className="admin-btn" onClick={() => removeProduct(product.id)} style={{ flex: 1, background: "#dc2626" }}>
+                            <FiTrash2 /> Delete
+                          </button>
+                        </div>
                       </div>
                     </ProductCard>
                   ))}
@@ -1050,16 +1059,6 @@ const addNewProduct = async (e) => {
             </>
           )}
 
-          {adminTab === "users" && (
-            <div>
-              <h2>Users</h2>
-              <ul>
-                {users.map((user, i) => (
-                  <li key={user.id || i}>{user.name} ({user.email}) - {user.role}</li>
-                ))}
-              </ul>
-            </div>
-          )}
           {adminTab === "orders" && (
             <div>
               <h2>Customer Orders</h2>
@@ -1179,73 +1178,88 @@ const addNewProduct = async (e) => {
      {/* --- DEALS SECTION --- */}
      <div className="deals-section">
        <h2>Deals & Discounts</h2>
-       <div className="product-grid">
-         {allProducts
-           .filter(product => {
-             const discountPrice = product.discountPrice || product.discountprice;
-             const hasDiscount = discountPrice && parseFloat(discountPrice) < parseFloat(product.price || 0);
-             const matchesCategory = selectedCat === "All" || product.category === selectedCat;
-             const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
-             return hasDiscount && matchesCategory && matchesSearch;
-           })
-           .map(product => {
-             const discountPrice = product.discountPrice || product.discountprice;
-             return (
-               <ProductCard key={product.id} product={product}>
-                 <div className="product-info">
-                   <h3>{product.name}</h3>
-                   <div className="price">
-                     <span className="discounted-price">Ksh {discountPrice} (Excl. tax)</span>
-                     <span className="original-price">Ksh {product.price} (Excl. tax)</span>
+       {productsLoading ? (
+         <div className="loading-indicator">Loading deals...</div>
+       ) : (
+         <div className="product-grid">
+           {allProducts
+             .filter(product => {
+               const discountPrice = product.discountPrice || product.discountprice;
+               const hasDiscount = discountPrice && parseFloat(discountPrice) < parseFloat(product.price || 0);
+               const matchesCategory = selectedCat === "All" || product.category === selectedCat;
+               const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
+               return hasDiscount && matchesCategory && matchesSearch;
+             })
+             .map(product => {
+               const discountPrice = product.discountPrice || product.discountprice;
+               return (
+                 <ProductCard key={product.id} product={product}>
+                   <div className="product-info">
+                     <h3>{product.name}</h3>
+                     <div className="price">
+                       <span className="discounted-price">Ksh {discountPrice} (Excl. tax)</span>
+                       <span className="original-price">Ksh {product.price} (Excl. tax)</span>
+                     </div>
+                     <p>{product.description}</p>
+                     <button
+                       style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
+                       onClick={() => {
+                         const phone = '254790999150';
+                         const message = encodeURIComponent(`Hello, I want to buy the ${product.name} (Ksh ${product.price}).`);
+                         window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                       }}
+                     >
+                       Order via WhatsApp
+                     </button>
                    </div>
-                   <p>{product.description}</p>
-                   <button
-                     style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
-                     onClick={() => {
-                       const phone = '254790999150';
-                       const message = encodeURIComponent(`Hello, I want to buy the ${product.name} (Ksh ${product.price}).`);
-                       window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-                     }}
-                   >
-                     Order via WhatsApp
-                   </button>
-                 </div>
-               </ProductCard>
-             );
-           })}
-       </div>
+                 </ProductCard>
+               );
+             })}
+         </div>
+       )}
      </div>
      {/* --- END DEALS SECTION --- */}
 
      <div id="products" className="products-section">
        <h2>Our Products</h2>
-       <div className="product-grid">
-         {allProducts
-             .filter(product => (selectedCat === "All" ? true : product.category === selectedCat))
-             .filter(product => product.name.toLowerCase().includes(search.toLowerCase()))
-             .map(product => (
-               <ProductCard key={product.id} product={product}>
-                 <div className="product-info">
-                   <h3>{product.name}</h3>
-                   <p>{product.description}</p>
-                   <div className="price">Ksh {product.price} (Excl. tax)</div>
-                   <button
-                     style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
-                     onClick={() => {
-                       const phone = '254790999150';
-                       const message = encodeURIComponent(
-                         `Hello, I want to buy the ${product.name} (Ksh ${product.price}).`
-                       );
-                       window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-                     }}
-                   >
-                     Buy via WhatsApp
-                   </button>
-                 </div>
-               </ProductCard>
-             ))
-         }
-       </div>
+       {productsLoading ? (
+         <div className="loading-indicator">Loading products...</div>
+       ) : (
+         <div className="product-grid">
+           {allProducts
+               .filter(product => {
+                 const discountPrice = product.discountPrice || product.discountprice;
+                 const hasDiscount = discountPrice && parseFloat(discountPrice) < parseFloat(product.price || 0);
+                 const matchesCategory = selectedCat === "All" || product.category === selectedCat;
+                 const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
+                 return !hasDiscount && matchesCategory && matchesSearch;
+               })
+               .map(product => (
+                 <ProductCard key={product.id} product={product}>
+                   <div className="product-info">
+                     <h3>{product.name}</h3>
+                     <div className="price">
+                       <span className="discounted-price">Ksh {product.price} (Excl. tax)</span>
+                     </div>
+                     <p>{product.description}</p>
+                     <button
+                       style={{ background: '#25d366', color: 'white', marginLeft: '8px', marginTop: '4px' }}
+                       onClick={() => {
+                         const phone = '254790999150';
+                         const message = encodeURIComponent(
+                           `Hello, I want to buy the ${product.name} (Ksh ${product.price}).`
+                         );
+                         window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                       }}
+                     >
+                       Order via WhatsApp
+                     </button>
+                   </div>
+                 </ProductCard>
+               ))
+           }
+         </div>
+       )}
      </div>
 
      {showCart && (
