@@ -1,5 +1,5 @@
 // OPTIMIZED PRODUCT FETCHING - Replace your fetchProducts function with this
-// This version loads products 3-5x faster
+// This version loads products 3-5x faster - Limited to 50 items for fast initial load
 
 import { supabase } from './supabaseClient';
 
@@ -14,7 +14,8 @@ export const fetchProductsOptimized = async (setAllProducts, setProductsLoading)
     const { data, error } = await supabase
       .from("products")
       .select("id, name, price, discountprice, category, description, inventory, image")
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false }
+    .limit(50));
     
     if (error) {
       console.error("Supabase error:", error);
