@@ -15,7 +15,7 @@ export const fetchProductsOptimized = async (setAllProducts, setProductsLoading)
       .from("products")
       .select("id, name, price, discountprice, category, description, inventory, image")
       .order('created_at', { ascending: false }
-    .limit(50));
+    .limit(50);
     
     if (error) {
       console.error("Supabase error:", error);
