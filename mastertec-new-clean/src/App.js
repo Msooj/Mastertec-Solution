@@ -182,9 +182,7 @@ function App() {
   useEffect(() => { if (isAdmin && adminTab === "reports") fetchReports(); }, [isAdmin, adminTab]);
 
 
-  const fetchProducts = () => {   fetchProductsOptimized(setAllProducts, setProductsLoading); };
-    setProductsLoading(true);
-    try {
+ const fetchProducts = async () => {    try {
       console.log("Fetching products from Supabase...");
       const { data, error } = await supabase.from("products").select("*");
       if (error) throw error;
