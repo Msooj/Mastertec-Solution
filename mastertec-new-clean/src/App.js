@@ -21,6 +21,11 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // Carousel CSS
 
 const API_URL = ""; // Removed localhost URL - using Supabase only on Vercel
 
+// Optimized fetch products using Supabase directly
+const fetchProducts = () => {
+  fetchProductsOptimized(setAllProducts, setProductsLoading);
+};
+
 const categoryIcons = {
   CCTV: <FiCamera />,
   Networking: <FiServer />,
