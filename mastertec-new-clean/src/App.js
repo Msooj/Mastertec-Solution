@@ -17,8 +17,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // Carousel CSS
 
 
 
-const API_URL = "http://localhost:5000";
-
+const API_URL = ""; // Removed localhost URL - using Supabase only on Vercel
 
 const categoryIcons = {
   CCTV: <FiCamera />,
