@@ -13,6 +13,8 @@ import Footer from "./Footer";
 import ProductCard from "./ProductCard";
 import { supabase } from "./supabaseClient";
 import { Carousel } from 'react-responsive-carousel';
+import { fetchProductsOptimized } from './optimizedFetch';
+
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Carousel CSS
 
 
@@ -180,7 +182,7 @@ function App() {
   useEffect(() => { if (isAdmin && adminTab === "reports") fetchReports(); }, [isAdmin, adminTab]);
 
 
-  const fetchProducts = async () => {
+  const fetchProducts = () => {   fetchProductsOptimized(setAllProducts, setProductsLoading); }; async () => {
     setProductsLoading(true);
     try {
       console.log("Fetching products from Supabase...");
