@@ -14,7 +14,7 @@ export const fetchProductsOptimized = async (setAllProducts, setProductsLoading)
     const { data, error } = await supabase
       .from("products")
       .select("id, name, price, discountprice, category, description, inventory, image")
-      .order('created_at', { ascending: false }
+      .order('created_at', { ascending: false })
     .limit(50);
     
     if (error) {
